@@ -1,6 +1,7 @@
 package es.unizar.urlshortener
 
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCaseImpl
+import es.unizar.urlshortener.core.usecases.CheckShortUrlUseCaseImpl
 import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
 import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
 import es.unizar.urlshortener.core.usecases.CreateQrCodeUseCaseImpl
@@ -57,4 +58,7 @@ class ApplicationConfiguration(
 
     @Bean
     fun getQrImageUseCase() = GetQrImageUseCaseImpl(qrCodeRepositoryService())
+
+    @Bean
+    fun checkShortUrlUseCase() = CheckShortUrlUseCaseImpl()
 }
