@@ -31,7 +31,7 @@ class CreateQrCodeUseCaseImpl(
             // Render the QR Code into a BoofCV style image. It's also possible to create PDF documents
             // 15 = pixelsPerModule (square)
             val generator = QrCodeGeneratorImage(15).render(qr)
-            val id: String = hashService.hasUrl("qr"+url)
+            val id: String = hashService.hasUrl("qr"+url.getQuery())
             val qu = QrCode(
                 hash = id,
                 gray = generator.getGray(),

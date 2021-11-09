@@ -101,7 +101,7 @@ class UrlShortenerControllerImpl(
                 h.setContentType(MediaType.IMAGE_PNG)
                 val baos = ByteArrayOutputStream();
                 ImageIO.write(it.gray?.asBufferedImage(), "png", baos);
-                ResponseEntity<ByteArray>(baos.toByteArray(), h, HttpStatus.CREATED)
+                ResponseEntity<ByteArray>(baos.toByteArray(), h, HttpStatus.OK)
             }
             
         
@@ -125,13 +125,9 @@ class UrlShortenerControllerImpl(
             )
             if(data.createQR==true){
                 createQrCodeUseCase.create(url).let{
-                    response.qr = linkTo<UrlShortenerControllerImpl> { getQrImage(it.hash, request) }.toUri()     
+                   response.qr = linkTo<UrlShortenerControllerImpl> { getQrImage(it.hash, request) }.toUri()     
 				};
 			}
-                /*createQrCodeUseCase.create(url).let{
-                    qrUrl = url
-				};*/
-
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
 }

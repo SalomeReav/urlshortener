@@ -102,13 +102,13 @@ $ curl -v -d "url=http://www.unizar.es/" -d "createQR=true" http://localhost:808
 < Transfer-Encoding: chunked
 < Date: Tue, 09 Nov 2021 06:41:43 GMT
 <
-{"url":"http://localhost:8080/tiny-6bb9db44","qr":"http://localhost:8080/qr/27d6d0f4","properties":{"safe":true}}* Connection #0 to host localhost left intact
+{"url":"http://localhost:8080/tiny-6bb9db44","qr":"http://localhost:8080/qr/d3761154","properties":{"safe":true}}* Connection #0 to host localhost left intact
 ```
 
 And navigate to the qr url:
 
 ```shell
-curl -v http://localhost:8080/qr/27d6d0f4
+curl -v http://localhost:8080/qr/d3761154
 *   Trying ::1...
 * TCP_NODELAY set
 * Connected to localhost (::1) port 8080 (#0)
