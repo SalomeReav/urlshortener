@@ -81,6 +81,49 @@ $ curl -v http://localhost:8080/tiny-6bb9db44
 * Connection #0 to host localhost left intact
 ```
 
+For test qrCode service:
+
+```shell
+$ curl -v -d "url=http://www.unizar.es/" -d "createQR=true" http://localhost:8080/api/link
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> POST /api/link HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.55.1
+> Accept: */*
+> Content-Length: 39
+> Content-Type: application/x-www-form-urlencoded
+>
+* upload completely sent off: 39 out of 39 bytes
+< HTTP/1.1 201
+< Location: http://localhost:8080/tiny-6bb9db44
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Tue, 09 Nov 2021 06:41:43 GMT
+<
+{"url":"http://localhost:8080/tiny-6bb9db44","qr":"http://localhost:8080/qr/27d6d0f4","properties":{"safe":true}}* Connection #0 to host localhost left intact
+```
+
+And navigate to the qr url:
+
+```shell
+curl -v http://localhost:8080/qr/27d6d0f4
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> GET /qr/27d6d0f4 HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.55.1
+> Accept: */*
+>
+< HTTP/1.1 201
+< Content-Type: image/png
+< Content-Length: 8323
+< Date: Tue, 09 Nov 2021 06:42:48 GMT
+<
+```
+
 ## Build and Run
 
 The uberjar can be built and then run with:
@@ -92,7 +135,7 @@ java -jar app/build/libs/app.jar
 
 ## Functionalities
 
-The project offers a minimum set of functionalities:
+The project offers a set of functionalities:
 
 * **Create a short URL**. 
   See in `core` the use case `CreateShortUrlUseCase` and in `delivery` the REST controller `UrlShortenerController`.
@@ -103,6 +146,11 @@ The project offers a minimum set of functionalities:
 * **Log redirects**.
   See in `core` the use case `LogClickUseCase` and in `delivery` the REST controller `UrlShortenerController`.
 
+* **Create a QrCode`URL**.
+  See in `core` the use case `CreateQrCodeUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+  
+* **Get QrCode Image**.
+  See in `core` the use case `GetQrImageUseCase` and in `delivery` the REST controller `UrlShortenerController`.
 The objects in the domain are:
 
 * `ShortUrl`: the minimum information about a short url
@@ -110,13 +158,16 @@ The objects in the domain are:
 * `ShortUrlProperties`: a handy way to extend data about a short url
 * `Click`: the minimum data captured when a redirection is logged
 * `ClickProperties`: a handy way to extend data about a click
+* `QrCode`:  the minimun information about a qrcode
+
 
 ## Delivery
 
 The above functionality is available through a simple API:
 
-* `POST /api/link` which creates a short URL from data send by a form.
+* `POST /api/link` which creates a short URL and a qrcode URL(if specified) from data send by a form.
 * `GET /tiny-{id}` where `id` identifies the short url, deals with redirects, and logs use (i.e. clicks).
+* `GET /qr/{id}` where `id` identifies the qrCode, returns a qrcode containing the short URL.
 
 In addition, `GET /` returns the landing page of the system. 
 
@@ -128,8 +179,8 @@ All the data is stored in a relational database.
 There are only two tables.
 
 * **shorturl** that represents short url and encodes in each row `ShortUrl` related data 
-* **click** that represents clicks and encodes in each row `Click` related data
-
+* **click** that represents clicks and encodes in each row `Click` related 
+* **qrcode** that represents qr codes in each row `QrCode` related data
 ## Reference Documentation
 
 For further reference, please consider the following sections:
