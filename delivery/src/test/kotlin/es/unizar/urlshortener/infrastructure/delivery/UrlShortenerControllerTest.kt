@@ -93,7 +93,7 @@ class UrlShortenerControllerTest {
         given(createShortUrlUseCase.create(
             url = "ftp://example.com/",
             data = ShortUrlProperties(ip = "127.0.0.1")
-        )).willAnswer { throw InvalidUrlException("ftp://example.com/") }
+        )).willAnswer { throw InvalidUrlException( "ftp://example.com/") }
 
         mockMvc.perform(post("/api/link")
             .param("url", "ftp://example.com/")
@@ -101,6 +101,19 @@ class UrlShortenerControllerTest {
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.statusCode").value(400))
     }
+   /* @Test
+    fun `creates returns bad request if it url not reachable`() {
+        given(createShortUrlUseCase.create(
+            url = "http://example99999.com/",
+            data = ShortUrlProperties(ip = "127.0.0.1")
+        )).willAnswer { throw NonReachableUrlException ("http://example99999.com/") }
+        mockMvc.perform(post("/api/link")
+            .param("url", "http://notreachableurl.com/")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.statusCode").value(400))
+    }*/
+
     @Test
     fun `creates returns a qrCode url if specified `(){
         given(createShortUrlUseCase.create(

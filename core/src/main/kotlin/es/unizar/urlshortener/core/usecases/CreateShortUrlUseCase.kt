@@ -20,10 +20,10 @@ class CreateShortUrlUseCaseImpl(
     private val shortUrlRepository: ShortUrlRepositoryService,
     private val validatorService: ValidatorService,
     private val hashService: HashService,
-    private val checkShortUrlUseCase: CheckShortUrlUseCase
+    private val checkReachableService: CheckReachableService
 ) : CreateShortUrlUseCase {
     override fun create(url: String, data: ShortUrlProperties): ShortUrl =
-        if (validatorService.isValid(url) && checkShortUrlUseCase.check(url)) {
+        if (validatorService.isValid(url) && checkReachableService.isReachable(url)) {
             val id: String = hashService.hasUrl(url)
             val su = ShortUrl(
                 hash = id,

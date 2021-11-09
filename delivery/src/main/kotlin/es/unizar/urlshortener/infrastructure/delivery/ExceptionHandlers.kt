@@ -3,6 +3,7 @@ package es.unizar.urlshortener.infrastructure.delivery
 import es.unizar.urlshortener.core.InvalidUrlException
 import es.unizar.urlshortener.core.RedirectionNotFound
 import es.unizar.urlshortener.core.QrCodeNotFound
+import es.unizar.urlshortener.core.NonReachableUrlException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -35,6 +36,11 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [QrCodeNotFound::class])
     @ResponseStatus(HttpStatus.NOT_FOUND)
     protected fun qrCodeNotFound(ex: QrCodeNotFound) = ErrorMessage(HttpStatus.NOT_FOUND.value(), ex.message)
+
+    @ResponseBody
+    @ExceptionHandler(value = [NonReachableUrlException::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun nonReachableUrls(ex: NonReachableUrlException) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 }
 
 data class ErrorMessage(
