@@ -1,6 +1,7 @@
 package es.unizar.urlshortener
 
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCaseImpl
+import es.unizar.urlshortener.core.usecases.CheckShortUrlUseCaseImpl
 import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
 import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
@@ -43,4 +44,7 @@ class ApplicationConfiguration(
 
     @Bean
     fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
+
+    @Bean
+    fun checkShortUrlUseCase() = CheckShortUrlUseCaseImpl()
 }
