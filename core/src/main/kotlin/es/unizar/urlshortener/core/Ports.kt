@@ -16,7 +16,7 @@ interface ShortUrlRepositoryService {
 }
 
 /**
- * [ShortUrlRepositoryService] is the port to the repository that provides management to [ShortUrl][ShortUrl].
+ * [QrCodeRepositoryService] is the port to the repository that provides management to [QrCode][QrCode].
  */
 interface QrCodeRepositoryService {
     fun findByKey(id: String): QrCode?

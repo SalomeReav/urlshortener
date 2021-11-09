@@ -8,9 +8,6 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 /**
  * Given a shorted url returns if it's reachable or not.
- *
- *
- * **Note**: This is an example of functionality.
  */
 interface CheckShortUrlUseCase {
     fun check(url: String) : Boolean
@@ -23,12 +20,16 @@ class CheckShortUrlUseCaseImpl(
 
 ) : CheckShortUrlUseCase{
     override fun check(url: String) : Boolean{
-        val client = HttpClient.newBuilder().build();
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .build();
-            
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return (200 == response.statusCode())
+        try {
+            val client = HttpClient.newBuilder().build();
+            val request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return (200 == response.statusCode())
+        } catch (e:Exception){
+            throw InvalidUrlException(url)
+        }
+       
     }
 }

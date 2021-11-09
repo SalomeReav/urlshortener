@@ -6,6 +6,7 @@ import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
 import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
 import es.unizar.urlshortener.core.usecases.CreateQrCodeUseCaseImpl
 import es.unizar.urlshortener.core.usecases.GetQrImageUseCaseImpl
+import es.unizar.urlshortener.core.usecases.CheckShortUrlUseCase
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
@@ -27,7 +28,7 @@ import org.springframework.context.annotation.Configuration
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
     @Autowired val clickEntityRepository: ClickEntityRepository,
-    @Autowired val qrCodeEntityRepository: QrCodeEntityRepository
+    @Autowired val qrCodeEntityRepository: QrCodeEntityRepository,
 ) {
     @Bean
     fun clickRepositoryService() = ClickRepositoryServiceImpl(clickEntityRepository)
@@ -43,6 +44,9 @@ class ApplicationConfiguration(
 
     @Bean
     fun hashService() = HashServiceImpl()
+    
+    @Bean
+    fun checkShortUrlUseCase() = CheckShortUrlUseCaseImpl()
 
     @Bean
     fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
@@ -51,7 +55,7 @@ class ApplicationConfiguration(
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
+    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), checkShortUrlUseCase())
     
     @Bean
     fun createQrCodeUseCase() = CreateQrCodeUseCaseImpl(qrCodeRepositoryService(), hashService())
@@ -59,6 +63,4 @@ class ApplicationConfiguration(
     @Bean
     fun getQrImageUseCase() = GetQrImageUseCaseImpl(qrCodeRepositoryService())
 
-    @Bean
-    fun checkShortUrlUseCase() = CheckShortUrlUseCaseImpl()
 }

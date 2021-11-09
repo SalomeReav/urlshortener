@@ -50,6 +50,11 @@ interface UrlShortenerController {
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
+    /**
+     * Returns a image from a url identified by it [id].
+     *
+     * **Note**: Delivery of use case [GetQrImageUseCase].
+     */
     fun getQrImage(id: String, request: HttpServletRequest): ResponseEntity<ByteArray>
 }
 

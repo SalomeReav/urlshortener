@@ -7,10 +7,7 @@ import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage
 import java.net.URI
 
 /**
- * Given an url returns the key that is used to create a short URL.
- * When the url is created optional data may be added.
- *
- * **Note**: This is an example of functionality.
+ * Given an url returns the key that is used to create a Qr Code url.
  */
 interface CreateQrCodeUseCase {
     fun create(url: URI): QrCode
@@ -24,11 +21,10 @@ class CreateQrCodeUseCaseImpl(
     private val hashService: HashService
 ) : CreateQrCodeUseCase {
     override fun create(url: URI): QrCode 
-            // Create the QrCode data structure with your message.
         {
+            // Create the QrCode data structure with the url.
             val qr = QrCodeEncoder().addAutomatic(url.toString()).fixate();
-            //======================================================================================
-            // Render the QR Code into a BoofCV style image. It's also possible to create PDF documents
+            // Render the QR Code into a BoofCV style image
             // 15 = pixelsPerModule (square)
             val generator = QrCodeGeneratorImage(15).render(qr)
             val id: String = hashService.hasUrl("qr"+url.getQuery())

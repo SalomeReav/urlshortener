@@ -27,7 +27,7 @@ class ShortUrlRepositoryServiceImpl(
 }
 
 /**
- * Implementation of the port [ShortUrlRepositoryService].
+ * Implementation of the port [QrCodeRepositoryServiceImpl].
  */
 class QrCodeRepositoryServiceImpl(
     private val qrCodeEntityRepository: QrCodeEntityRepository

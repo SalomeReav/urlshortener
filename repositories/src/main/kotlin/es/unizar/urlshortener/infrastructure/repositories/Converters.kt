@@ -65,7 +65,7 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
 )
 
 /**
- * Extension method to convert a [ShortUrlEntity] into a domain [ShortUrl].
+ * Extension method to convert a [QrCodeEntity] into a domain [QrCode].
  */
 fun QrCodeEntity.toDomain() = QrCode(
     hash = hash,
@@ -73,7 +73,7 @@ fun QrCodeEntity.toDomain() = QrCode(
 )
 
 /**
- * Extension method to convert a domain [ShortUrl] into a [ShortUrlEntity].
+ * Extension method to convert a domain [QrCode] into a [QrCodeEntity].
  */
 fun QrCode.toEntity() = QrCodeEntity(
     hash = hash,

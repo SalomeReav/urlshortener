@@ -42,7 +42,7 @@ class ShortUrlEntity(
 )
 
 /**
- * The [QrCodeEntity] entity stores short urls.
+ * The [QrCodeEntity] entity stores qrcode image.
  */
 @Entity
 @Table(name = "qrcode")

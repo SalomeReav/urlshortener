@@ -5,10 +5,7 @@ import es.unizar.urlshortener.core.QrCodeNotFound
 import es.unizar.urlshortener.core.QrCodeRepositoryService
 
 /**
- * Given a key returns a [Redirection] that contains a [URI target][Redirection.target]
- * and an [HTTP redirection mode][Redirection.mode].
- *
- * **Note**: This is an example of functionality.
+ * Given a key returns a [QrCode] that contains a [GrayU8 Image]
  */
 interface GetQrImageUseCase {
     fun getQrImage(key: String): QrCode

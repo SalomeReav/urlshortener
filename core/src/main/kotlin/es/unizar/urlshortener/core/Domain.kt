@@ -24,7 +24,7 @@ data class ShortUrl(
 )
 
 /**
- * A [QRUrl] is the mapping between a remote url identified by [redirection] and a local short url identified by [hash].
+ * A [QRUrl] contains a qrcode image [gray] identified by [hash].
  */
 data class QrCode(
     val hash: String,
