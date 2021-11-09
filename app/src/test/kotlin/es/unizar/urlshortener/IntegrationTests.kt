@@ -3,6 +3,7 @@ package es.unizar.urlshortener
 import es.unizar.urlshortener.infrastructure.delivery.ShortUrlDataOut
 import org.apache.http.impl.client.HttpClientBuilder
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,7 +58,7 @@ class HttpRequestTest {
 
     @Test
     fun `redirectTo returns a redirect when the key exists`() {
-        val target = shortUrl("http://example.com/").headers.location
+        val target = shortUrl("http://example.com/",false).headers.location
         require(target != null)
         val response = restTemplate.getForEntity(target, String::class.java)
         assertThat(response.statusCode).isEqualTo(HttpStatus.TEMPORARY_REDIRECT)
@@ -76,11 +77,13 @@ class HttpRequestTest {
 
     @Test
     fun `creates returns a basic redirect if it can compute a hash`() {
-        val response = shortUrl("http://example.com/")
+        val response = shortUrl("http://example.com/",false)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+                assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/tiny-f684a3c4"))
+
         assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/tiny-f684a3c4"))
-        assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/tiny-f684a3c4"))
+        assertNull(response.body?.qr)
 
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
@@ -103,16 +106,42 @@ class HttpRequestTest {
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
     }
 
-    private fun shortUrl(url: String): ResponseEntity<ShortUrlDataOut> {
+    @Test
+    fun `creates returns a qrcode url if the short url is created`(){
+        val response = shortUrl("http://www.unizar.es/",true)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/tiny-6bb9db44"))
+        assertThat(response.body?.qr).isEqualTo(URI.create("http://localhost:$port/qr/d3761154"))
+        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "qrcode")).isEqualTo(1)
+	}
+
+    @Test
+    fun `getQrImage returns a image when the key exists`() {
+        val target = shortUrl("http://www.unizar.es/",true).body?.qr
+        require(target != null)
+        val response = restTemplate.getForEntity(target, String::class.java)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.headers.contentType).isEqualTo(MediaType.IMAGE_PNG)
+    }
+
+    @Test
+    fun `getQrImage returns a not found when the key does not exist`() {
+        val response = restTemplate.getForEntity("http://localhost:$port/qr/27d6d0f4", String::class.java)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    private fun shortUrl(url: String, qr:Boolean): ResponseEntity<ShortUrlDataOut> {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
         val data: MultiValueMap<String, String> = LinkedMultiValueMap()
         data["url"] = url
-
+        if(qr) data["createQR"] = "true"
+            
         return restTemplate.postForEntity(
             "http://localhost:$port/api/link",
             HttpEntity(data, headers), ShortUrlDataOut::class.java
         )
     }
+
 }
