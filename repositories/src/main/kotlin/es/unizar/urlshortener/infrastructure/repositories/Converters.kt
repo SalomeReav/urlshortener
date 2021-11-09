@@ -64,3 +64,18 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
     country = properties.country
 )
 
+/**
+ * Extension method to convert a [ShortUrlEntity] into a domain [ShortUrl].
+ */
+fun QrCodeEntity.toDomain() = QrCode(
+    hash = hash,
+    gray = gray
+)
+
+/**
+ * Extension method to convert a domain [ShortUrl] into a [ShortUrlEntity].
+ */
+fun QrCode.toEntity() = QrCodeEntity(
+    hash = hash,
+    gray = gray
+)

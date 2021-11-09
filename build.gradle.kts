@@ -20,7 +20,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "11"
+            jvmTarget = "14"
         }
     }
     tasks.withType<Test> {
@@ -28,6 +28,8 @@ subprojects {
     }
     dependencies {
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        arrayOf("core","swing","kotlin","WebcamCapture").forEach()
+         { "implementation"("org.boofcv:boofcv-$it:0.39.1") }
     }
 }
 

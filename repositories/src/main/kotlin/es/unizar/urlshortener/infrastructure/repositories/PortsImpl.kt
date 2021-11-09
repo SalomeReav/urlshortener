@@ -4,7 +4,8 @@ import es.unizar.urlshortener.core.Click
 import es.unizar.urlshortener.core.ClickRepositoryService
 import es.unizar.urlshortener.core.ShortUrl
 import es.unizar.urlshortener.core.ShortUrlRepositoryService
-
+import es.unizar.urlshortener.core.QrCode
+import es.unizar.urlshortener.core.QrCodeRepositoryService
 /**
  * Implementation of the port [ClickRepositoryService].
  */
@@ -25,3 +26,13 @@ class ShortUrlRepositoryServiceImpl(
     override fun save(su: ShortUrl): ShortUrl = shortUrlEntityRepository.save(su.toEntity()).toDomain()
 }
 
+/**
+ * Implementation of the port [ShortUrlRepositoryService].
+ */
+class QrCodeRepositoryServiceImpl(
+    private val qrCodeEntityRepository: QrCodeEntityRepository
+) : QrCodeRepositoryService {
+    override fun findByKey(id: String): QrCode? = qrCodeEntityRepository.findByHash(id)?.toDomain()
+
+    override fun save(qc: QrCode): QrCode = qrCodeEntityRepository.save(qc.toEntity()).toDomain()
+}

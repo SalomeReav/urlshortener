@@ -2,6 +2,7 @@ package es.unizar.urlshortener.core
 
 import java.time.OffsetDateTime
 import java.util.*
+import boofcv.struct.image.GrayU8;
 
 /**
  * A [Click] captures a request of redirection of a [ShortUrl] identified by its [hash].
@@ -20,6 +21,14 @@ data class ShortUrl(
     val redirection: Redirection,
     val created: OffsetDateTime = OffsetDateTime.now(),
     val properties: ShortUrlProperties = ShortUrlProperties()
+)
+
+/**
+ * A [QRUrl] is the mapping between a remote url identified by [redirection] and a local short url identified by [hash].
+ */
+data class QrCode(
+    val hash: String,
+    val gray: GrayU8? = null,
 )
 
 /**
