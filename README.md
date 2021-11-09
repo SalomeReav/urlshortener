@@ -146,11 +146,12 @@ The project offers a set of functionalities:
 * **Log redirects**.
   See in `core` the use case `LogClickUseCase` and in `delivery` the REST controller `UrlShortenerController`.
 
-* **Create a QrCode`URL**.
+* **Create a QrCode URL**.
   See in `core` the use case `CreateQrCodeUseCase` and in `delivery` the REST controller `UrlShortenerController`.
   
 * **Get QrCode Image**.
   See in `core` the use case `GetQrImageUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+  
 The objects in the domain are:
 
 * `ShortUrl`: the minimum information about a short url
