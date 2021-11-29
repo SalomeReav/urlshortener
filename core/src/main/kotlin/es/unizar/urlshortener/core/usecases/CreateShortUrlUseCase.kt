@@ -2,6 +2,7 @@ package es.unizar.urlshortener.core.usecases
 
 
 import es.unizar.urlshortener.core.*
+import es.unizar.urlshortener.gateway.*
 import java.util.Date
 /**
  * Given an url returns the key that is used to create a short URL.
@@ -23,7 +24,7 @@ class CreateShortUrlUseCaseImpl(
     private val checkReachableService: CheckReachableService
 ) : CreateShortUrlUseCase {
     override fun create(url: String, data: ShortUrlProperties): ShortUrl =
-        if (validatorService.isValid(url) && checkReachableService.isReachable(url)) {
+        if (validatorService.isValid(url) && checkReachableService.isReachable(url) && checkUrlSafe(url)) {
             val id: String = hashService.hasUrl(url)
             val su = ShortUrl(
                 hash = id,
