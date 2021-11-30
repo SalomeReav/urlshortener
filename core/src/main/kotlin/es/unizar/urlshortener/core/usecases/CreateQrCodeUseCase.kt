@@ -27,7 +27,9 @@ class CreateQrCodeUseCaseImpl(
             // Render the QR Code into a BoofCV style image
             // 15 = pixelsPerModule (square)
             val generator = QrCodeGeneratorImage(15).render(qr)
-            val id: String = hashService.hasUrl("qr"+url.getQuery())
+            val urlString = url.toString()
+            val id: String = urlString.substring(urlString.lastIndexOf("-")+1)
+
             val qu = QrCode(
                 hash = id,
                 gray = generator.getGray(),
