@@ -49,3 +49,12 @@ interface HashService {
 interface CheckReachableService {
     fun isReachable(url: String): Boolean
 }
+
+/**
+ * [CheckURLSafeService] is the port to the service that check if an url is reacheble.
+ *
+ * **Note**: It is a design decision to create this port. It could be part of the core .
+ */
+interface CheckURLSafeService {
+    fun checkUrlSafe (url: String) : Boolean
+}
