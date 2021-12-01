@@ -38,11 +38,11 @@ class HashServiceImpl : HashService {
 class CheckReachableServiceImpl : CheckReachableService {
     override fun isReachable(url: String):Boolean {
         try {
-            val client = HttpClient.newBuilder().build();
+            val client = HttpClient.newBuilder().build()
             val request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .build();
-            val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                .build()
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
             return (200 == response.statusCode())
         } catch (e:Exception){
             throw NonReachableUrlException(url)

@@ -155,12 +155,12 @@ class UrlShortenerControllerTest {
     }
 
     private fun qrCode(url: URI): QrCode {
-        val qr = QrCodeEncoder().addAutomatic(url.toString()).fixate();
+        val qr = QrCodeEncoder().addAutomatic(url.toString()).fixate()
         val generator = QrCodeGeneratorImage(15).render(qr)
-        val id: String = Hashing.murmur3_32().hashString("qr"+url.getQuery(), StandardCharsets.UTF_8).toString()
+        val id: String = Hashing.murmur3_32().hashString("qr"+url.query, StandardCharsets.UTF_8).toString()
         return QrCode(
             hash = id,
-            gray = generator.getGray(),
+            gray = generator.gray,
         )
     }
 }

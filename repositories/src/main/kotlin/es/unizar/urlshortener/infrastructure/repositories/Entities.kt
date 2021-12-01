@@ -3,7 +3,7 @@ package es.unizar.urlshortener.infrastructure.repositories
 import java.time.OffsetDateTime
 import java.util.*
 import javax.persistence.*
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.GrayU8
 
 /**
  * The [ClickEntity] entity logs clicks.
