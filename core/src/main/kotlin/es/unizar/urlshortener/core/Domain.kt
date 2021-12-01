@@ -2,7 +2,8 @@ package es.unizar.urlshortener.core
 
 import java.time.OffsetDateTime
 import java.util.*
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.GrayU8
+import javax.print.attribute.IntegerSyntax
 
 /**
  * A [Click] captures a request of redirection of a [ShortUrl] identified by its [hash].
@@ -48,7 +49,10 @@ data class ShortUrlProperties(
     val sponsor: String? = null,
     val safe: Boolean = true,
     val owner: String? = null,
-    val country: String? = null
+    val country: String? = null,
+    val clickscount: Int = 0,
+    val clicksdate: Map<String, Any> = emptyMap(), //String = shorturl, Any = date
+    val userscount: Int = 0
 )
 
 /**
@@ -61,3 +65,4 @@ data class ClickProperties(
     val platform: String? = null,
     val country: String? = null
 )
+
