@@ -111,7 +111,7 @@ class HttpRequestTest {
         val response = shortUrl("http://www.unizar.es/",true)
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
         assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/tiny-6bb9db44"))
-        assertThat(response.body?.qr).isEqualTo(URI.create("http://localhost:$port/qr/d3761154"))
+        assertThat(response.body?.qr).isEqualTo(URI.create("http://localhost:$port/qr/6bb9db44"))
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "qrcode")).isEqualTo(1)
 	}
 
