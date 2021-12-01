@@ -103,6 +103,22 @@ class HttpRequestTest {
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
     }
 
+    @Test
+    fun `Create shortened URL starting from a not reachable URL`() {
+        //hacemos un POST a /api/link con una URL que no es alcanzable (no devuelve 200)
+        val response = shortUrl("https://www.google.com/sfdifhdskjfhsdkjfdusihfsdaih")
+        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `Create shortened URL starting from a reachable URL`() {     
+        //hacemos un POST a /api/link con una URL que SI es alcanzable (devuelve 200)
+        val response = shortUrl("https://www.google.com/")
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/tiny-b8de6817"))
+        assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/tiny-b8de6817"))
+    }
+
     private fun shortUrl(url: String): ResponseEntity<ShortUrlDataOut> {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
