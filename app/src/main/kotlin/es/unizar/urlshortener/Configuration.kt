@@ -1,10 +1,6 @@
 package es.unizar.urlshortener
 
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCaseImpl
-import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
-import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
-import es.unizar.urlshortener.core.usecases.CreateQrCodeUseCaseImpl
-import es.unizar.urlshortener.core.usecases.GetQrImageUseCaseImpl
+import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.CheckReachableServiceImpl
@@ -54,12 +50,20 @@ class ApplicationConfiguration(
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), checkReachableService())
+    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), checkReachableService() )
     
     @Bean
-    fun createQrCodeUseCase() = CreateQrCodeUseCaseImpl(qrCodeRepositoryService(), hashService())
+    fun createQrCodeUseCase() = CreateQrCodeUseCaseImpl(qrCodeRepositoryService())
 
     @Bean
     fun getQrImageUseCase() = GetQrImageUseCaseImpl(qrCodeRepositoryService())
 
+    @Bean
+    fun getClicksNumberUseCase() = GetClicksNumberUseCaseImpl(shortUrlRepositoryService())
+
+    @Bean
+    fun getClicksDayUseCase() = GetClicksDayUseCaseImpl(shortUrlRepositoryService())
+
+    @Bean
+    fun getUsersCountUseCase() = GetUsersCountUseCaseImpl(shortUrlRepositoryService())
 }

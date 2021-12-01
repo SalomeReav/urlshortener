@@ -1,10 +1,5 @@
 package es.unizar.urlshortener.infrastructure.delivery
 import es.unizar.urlshortener.core.*
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.LogClickUseCase
-import es.unizar.urlshortener.core.usecases.RedirectUseCase
-import es.unizar.urlshortener.core.usecases.CreateQrCodeUseCase
-import es.unizar.urlshortener.core.usecases.GetQrImageUseCase
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
@@ -23,6 +18,7 @@ import java.net.URI
 import boofcv.alg.fiducial.qrcode.QrCodeEncoder
 import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage
 import com.google.common.hash.Hashing
+import es.unizar.urlshortener.core.usecases.*
 import java.nio.charset.StandardCharsets
 @WebMvcTest
 @ContextConfiguration(classes = [
@@ -47,6 +43,15 @@ class UrlShortenerControllerTest {
 
     @MockBean
     private lateinit var getQrImageUseCase: GetQrImageUseCase
+
+    @MockBean
+    private lateinit var getClicksNumberUseCase: GetClicksNumberUseCase
+
+    @MockBean
+    private lateinit var getClicksDayUseCase: GetClicksDayUseCase
+
+    @MockBean
+    private lateinit var getUsersCountUseCase: GetUsersCountUseCase
 
     @Test
     fun `redirectTo returns a redirect when the key exists`() {
@@ -132,7 +137,7 @@ class UrlShortenerControllerTest {
             .andExpect(status().isCreated)
             .andExpect(redirectedUrl("http://localhost/tiny-6bb9db44"))
             .andExpect(jsonPath("$.url").value("http://localhost/tiny-6bb9db44"))
-            .andExpect(jsonPath("$.qr").value("http://localhost/qr/d3761154"))
+            .andExpect(jsonPath("$.qr").value("http://localhost/qr/6bb9db44"))
     }
      @Test
     fun `getQrImage returns a image when the key exists`() {
@@ -157,7 +162,8 @@ class UrlShortenerControllerTest {
     private fun qrCode(url: URI): QrCode {
         val qr = QrCodeEncoder().addAutomatic(url.toString()).fixate()
         val generator = QrCodeGeneratorImage(15).render(qr)
-        val id: String = Hashing.murmur3_32().hashString("qr"+url.query, StandardCharsets.UTF_8).toString()
+        val urlString = url.toString()
+        val id: String = urlString.substring(urlString.lastIndexOf("-")+1)
         return QrCode(
             hash = id,
             gray = generator.gray,

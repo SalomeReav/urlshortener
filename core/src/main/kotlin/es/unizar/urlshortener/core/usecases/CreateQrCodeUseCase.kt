@@ -1,7 +1,6 @@
 package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.*
-import java.util.Date
 import boofcv.alg.fiducial.qrcode.QrCodeEncoder
 import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage
 import java.net.URI
@@ -18,7 +17,6 @@ interface CreateQrCodeUseCase {
  */
 class CreateQrCodeUseCaseImpl(
     private val qrCodeRepository: QrCodeRepositoryService,
-    private val hashService: HashService
 ) : CreateQrCodeUseCase {
     override fun create(url: URI): QrCode 
         {

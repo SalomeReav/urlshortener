@@ -171,7 +171,7 @@ class UrlShortenerControllerImpl(
                     "safe" to it.properties.safe
                 )
             )
-            if(data.createQR==true){
+            if(data.createQR == true){
                 createQrCodeUseCase.create(url).let{
                    response.qr = linkTo<UrlShortenerControllerImpl> { getQrImage(it.hash, request) }.toUri()     
 				}
