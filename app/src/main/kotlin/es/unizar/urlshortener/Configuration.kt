@@ -48,12 +48,13 @@ class ApplicationConfiguration(
     fun reachableService() = ReachableServiceImpl()
 
     @Bean
+    fun reachableService() = ReachableServiceImpl()
+
+    @Bean
     fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
 
     @Bean
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
-
-    @Bean
 
     @Bean
     fun createQrCodeUseCase() = CreateQrCodeUseCaseImpl(qrCodeRepositoryService())

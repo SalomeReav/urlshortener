@@ -7,7 +7,10 @@ class NonReachableUrlException(val url: String) : Exception("[$url] is not reach
 =======
 
 class NotReachableUrlException(val url: String) : Exception("[$url] does not return 200 code")
+<<<<<<< HEAD
 >>>>>>> 8bceb20 (check if reacheable)
+=======
+>>>>>>> 8bceb20485ddd9776bb806a52e35f8e8b42368ba
  
 class RedirectionNotFound(val key: String) : Exception("[$key] is not known")
 

@@ -38,6 +38,7 @@ class HashServiceImpl : HashService {
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * Implementation of the port [CheckReachableService].
  */
 @Suppress("UnstableApiUsage")
@@ -56,6 +57,8 @@ class CheckReachableServiceImpl : CheckReachableService {
     }
 }
 =======
+=======
+>>>>>>> 8bceb20485ddd9776bb806a52e35f8e8b42368ba
   * Implementation of the port [ReachableService].
   */
   class ReachableServiceImpl : ReachableService {
@@ -73,5 +76,9 @@ class CheckReachableServiceImpl : CheckReachableService {
             return false
         }
     }
+<<<<<<< HEAD
  }
 >>>>>>> 8bceb20 (check if reacheable)
+=======
+ }
+>>>>>>> 8bceb20485ddd9776bb806a52e35f8e8b42368ba

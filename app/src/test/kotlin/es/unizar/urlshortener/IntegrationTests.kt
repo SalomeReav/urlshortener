@@ -125,7 +125,6 @@ class HttpRequestTest {
     }
 
     @Test
-<<<<<<< HEAD
     fun `creates returns a qrcode url if the short url is created`(){
         val response = shortUrl("http://www.unizar.es/",true)
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
@@ -168,7 +167,7 @@ class HttpRequestTest {
     }
 
     private fun shortUrl(url: String, qr:Boolean): ResponseEntity<ShortUrlDataOut> {
-=======
+
     fun `Create shortened URL starting from a not reachable URL`() {
         //hacemos un POST a /api/link con una URL que no es alcanzable (no devuelve 200)
         val response = shortUrl("https://www.google.com/sfdifhdskjfhsdkjfdusihfsdaih")
@@ -185,7 +184,7 @@ class HttpRequestTest {
     }
 
     private fun shortUrl(url: String): ResponseEntity<ShortUrlDataOut> {
->>>>>>> 8bceb20 (check if reacheable)
+
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 
