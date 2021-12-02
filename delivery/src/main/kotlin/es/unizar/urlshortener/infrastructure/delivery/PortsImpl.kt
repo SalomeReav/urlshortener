@@ -6,13 +6,8 @@ import es.unizar.urlshortener.core.ReachableService
 import es.unizar.urlshortener.core.ValidatorService
 import org.apache.commons.validator.routines.UrlValidator
 import java.nio.charset.StandardCharsets
-import es.unizar.urlshortener.core.CheckReachableService
-import es.unizar.urlshortener.core.NonReachableUrlException
-import java.util.Date
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
+import es.unizar.urlshortener.core.NotReachableUrlException
+
 import java.net.URL
 import java.net.URLEncoder
 import java.net.HttpURLConnection
@@ -36,29 +31,7 @@ class HashServiceImpl : HashService {
     override fun hasUrl(url: String) = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString()
 }
 
-/**
-<<<<<<< HEAD
-<<<<<<< HEAD
- * Implementation of the port [CheckReachableService].
- */
-@Suppress("UnstableApiUsage")
-class CheckReachableServiceImpl : CheckReachableService {
-    override fun isReachable(url: String):Boolean {
-        try {
-            val client = HttpClient.newBuilder().build()
-            val request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .build()
-            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-            return (200 == response.statusCode())
-        } catch (e:Exception){
-            throw NonReachableUrlException(url)
-        }
-    }
-}
-=======
-=======
->>>>>>> 8bceb20485ddd9776bb806a52e35f8e8b42368ba
+  /* 
   * Implementation of the port [ReachableService].
   */
   class ReachableServiceImpl : ReachableService {
@@ -76,9 +49,5 @@ class CheckReachableServiceImpl : CheckReachableService {
             return false
         }
     }
-<<<<<<< HEAD
  }
->>>>>>> 8bceb20 (check if reacheable)
-=======
- }
->>>>>>> 8bceb20485ddd9776bb806a52e35f8e8b42368ba
+
