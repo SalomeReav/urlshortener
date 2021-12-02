@@ -54,23 +54,12 @@ interface UrlShortenerController {
      */
     fun getQrImage(id: String, request: HttpServletRequest): ResponseEntity<ByteArray>
     /**
-     * Returns the clicks number from a url identified by it [id]
+     * Returns the clicks number, clicks number filtered by date and the users count who
+     * pressed on a url identified by it [id]
      *
-     * **Note**: Delivery of use case [GetClicksNumbersUseCase].
+     * **Note**: Delivery of use cases [GetClicksNumbersUseCase] [GetClicksDayUseCase] [GetUsersCountUseCase].
      */
-    fun getClicksNumber(id: String, request: HttpServletRequest): ResponseEntity<Int>
-    /**
-     * Returns the clicks number from a url identified by it [id] filtered by date.
-     *
-     * **Note**: Delivery of use case [GetClicksDayUseCase].
-     */
-    fun getClicksDay(id: String, request: HttpServletRequest): ResponseEntity<ClicksByDay>
-    /**
-     * Returns the users count who pressed on a url identified by it [id]
-     *
-     * **Note**: Delivery of use case [GetUsersCountUseCase].
-     */
-    fun getUsersCount(id: String, request: HttpServletRequest): ResponseEntity<Int>
+    fun getClicksInfo(id: String, request: HttpServletRequest): ResponseEntity<ClicksDataOut>
 }
 
 /**
@@ -91,8 +80,10 @@ data class ShortUrlDataOut(
     val properties: Map<String, Any> = emptyMap()
 )
 
-data class ClicksByDay(
-    val clicksdate: Map<String, Any> = emptyMap()
+data class ClicksDataOut(
+    val clicks: Int = 0,
+    val users: Int = 0,
+    val clicksByDay: Map<String, Any> = emptyMap()
 )
 
 /**
@@ -113,12 +104,16 @@ class UrlShortenerControllerImpl(
 ) : UrlShortenerController {
 
     @GetMapping("/tiny-{id:.*}")
-    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
-        redirectUseCase.redirectTo(id).let {
-            logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
-            val h = HttpHeaders()
-            h.location = URI.create(it.target)
-            ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
+    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void>
+        {
+            var response: ResponseEntity<Void>
+            redirectUseCase.redirectTo(id).let {
+                logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
+                val h = HttpHeaders()
+                h.location = URI.create(it.target)
+                response = ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
+            }
+            return response
         }
     @GetMapping("/qr/{id:.*}")
     override fun getQrImage(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> =
@@ -130,28 +125,15 @@ class UrlShortenerControllerImpl(
                 ResponseEntity<ByteArray>(baos.toByteArray(), h, HttpStatus.OK)
             }
 
-    @GetMapping("/clicksnumber/{id:.*}")
-    override fun getClicksNumber(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Int> =
-        getClicksNumberUseCase.getClicksNumber(id).let {
-            ResponseEntity<Int>(it.clickscount, HttpStatus.OK)
-        }
-
-    @GetMapping("/clicksday/{id:.*}")
-    override fun getClicksDay(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClicksByDay> =
-        getClicksDayUseCase.getClicksDay(id).let {
-            var response = ClicksByDay(
-                clicksdate = mapOf(
-                    "clicksdate" to it.clicksdate
-                )
-            )
-            ResponseEntity<ClicksByDay>(response, HttpStatus.OK)
-        }
-
-    @GetMapping("/clickscount/{id:.*}")
-    override fun getUsersCount(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Int> =
-        getUsersCountUseCase.getUsersCount(id).let {
-            ResponseEntity<Int>(it.userscount, HttpStatus.OK)
-        }
+    @GetMapping("/{id:.*}.json")
+    override fun getClicksInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClicksDataOut> {
+        val data = ClicksDataOut(
+            clicks = getClicksNumberUseCase.getClicksNumber(id),
+            users = getUsersCountUseCase.getUsersCount(id),
+            clicksByDay = getClicksDayUseCase.getClicksDay(id)
+        )
+        return ResponseEntity<ClicksDataOut>(data, HttpStatus.OK)
+    }
 
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =

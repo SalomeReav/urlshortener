@@ -3,6 +3,7 @@ package es.unizar.urlshortener.core.usecases
 import es.unizar.urlshortener.core.Click
 import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.ClickRepositoryService
+import java.time.OffsetDateTime
 import java.util.Date
 
 /**
@@ -25,7 +26,8 @@ class LogClickUseCaseImpl(
             hash = key,
             properties = ClickProperties(
                 ip = data.ip
-            )
+            ),
+            created = OffsetDateTime.now()
         )
         clickRepository.save(cl)
     }

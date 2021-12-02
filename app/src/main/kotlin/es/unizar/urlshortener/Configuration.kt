@@ -59,11 +59,11 @@ class ApplicationConfiguration(
     fun getQrImageUseCase() = GetQrImageUseCaseImpl(qrCodeRepositoryService())
 
     @Bean
-    fun getClicksNumberUseCase() = GetClicksNumberUseCaseImpl(shortUrlRepositoryService())
+    fun getClicksNumberUseCase() = GetClicksNumberUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun getClicksDayUseCase() = GetClicksDayUseCaseImpl(shortUrlRepositoryService())
+    fun getClicksDayUseCase() = GetClicksDayUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun getUsersCountUseCase() = GetUsersCountUseCaseImpl(shortUrlRepositoryService())
+    fun getUsersCountUseCase() = GetUsersCountUseCaseImpl(clickRepositoryService())
 }

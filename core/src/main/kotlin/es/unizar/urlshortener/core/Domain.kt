@@ -50,9 +50,6 @@ data class ShortUrlProperties(
     val safe: Boolean = true,
     val owner: String? = null,
     val country: String? = null,
-    val clickscount: Int = 0,
-    val clicksdate: Map<String, Any> = emptyMap(), //String = shorturl, Any = date
-    val userscount: Int = 0
 )
 
 /**
@@ -63,6 +60,6 @@ data class ClickProperties(
     val referrer: String? = null,
     val browser: String? = null,
     val platform: String? = null,
-    val country: String? = null
+    val country: String? = null,
 )
 
