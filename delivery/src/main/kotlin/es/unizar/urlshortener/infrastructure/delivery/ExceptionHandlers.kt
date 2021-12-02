@@ -4,6 +4,7 @@ import es.unizar.urlshortener.core.*
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import es.unizar.urlshortener.core.NotReachableUrlException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
@@ -30,6 +31,7 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     protected fun redirectionNotFound(ex: RedirectionNotFound) = ErrorMessage(HttpStatus.NOT_FOUND.value(), ex.message)
 
     @ResponseBody
+<<<<<<< HEAD
     @ExceptionHandler(value = [QrCodeNotFound::class])
     @ResponseStatus(HttpStatus.NOT_FOUND)
     protected fun qrCodeNotFound(ex: QrCodeNotFound) = ErrorMessage(HttpStatus.NOT_FOUND.value(), ex.message)
@@ -43,10 +45,21 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [UnavailableUrl::class])
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     protected fun unavailableUrl(ex: UnavailableUrl) = ErrorMessage(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.message)
+=======
+    @ExceptionHandler(value = [NotReachableUrlException::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun uriNotReachable(ex: NotReachableUrlException) = ErrorMessageReachable(HttpStatus.BAD_REQUEST.value(), ex.message)
+>>>>>>> 8bceb20 (check if reacheable)
 }
 
 data class ErrorMessage(
     val statusCode: Int,
     val message: String?,
+    val timestamp: String = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now())
+)
+
+data class ErrorMessageReachable(
+    val statusCode: Int,
+    val error: String?,
     val timestamp: String = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now())
 )

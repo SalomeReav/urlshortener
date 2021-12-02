@@ -2,6 +2,7 @@ package es.unizar.urlshortener.infrastructure.delivery
 
 import com.google.common.hash.Hashing
 import es.unizar.urlshortener.core.HashService
+import es.unizar.urlshortener.core.ReachableService
 import es.unizar.urlshortener.core.ValidatorService
 import org.apache.commons.validator.routines.UrlValidator
 import java.nio.charset.StandardCharsets
@@ -12,6 +13,10 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.net.URL
+import java.net.URLEncoder
+import java.net.HttpURLConnection
+
 /**
  * Implementation of the port [ValidatorService].
  */
@@ -32,6 +37,7 @@ class HashServiceImpl : HashService {
 }
 
 /**
+<<<<<<< HEAD
  * Implementation of the port [CheckReachableService].
  */
 @Suppress("UnstableApiUsage")
@@ -49,3 +55,23 @@ class CheckReachableServiceImpl : CheckReachableService {
         }
     }
 }
+=======
+  * Implementation of the port [ReachableService].
+  */
+  class ReachableServiceImpl : ReachableService {
+    override fun isReachable(url: String): Boolean {
+        val auxUrl: URL = URL(url)
+        val connection: HttpURLConnection = auxUrl.openConnection() as HttpURLConnection
+        connection.setConnectTimeout(5000)
+        connection.connect()
+        val code = connection.getResponseCode()
+        println(code)
+
+        if (code == 200) { 
+            return true
+        } else{
+            return false
+        }
+    }
+ }
+>>>>>>> 8bceb20 (check if reacheable)
