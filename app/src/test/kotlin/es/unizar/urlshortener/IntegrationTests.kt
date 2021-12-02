@@ -130,7 +130,6 @@ class HttpRequestTest {
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
         assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/tiny-6bb9db44"))
         assertThat(response.body?.qr).isEqualTo(URI.create("http://localhost:$port/qr/6bb9db44"))
-
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "qrcode")).isEqualTo(1)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
@@ -164,6 +163,22 @@ class HttpRequestTest {
     fun `getQrImage returns a not found when the key does not exist`() {
         val response = restTemplate.getForEntity("http://localhost:$port/qr/27d6d0f4", String::class.java)
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `Create shortened URL starting from a not reachable URL`() {
+        //hacemos un POST a /api/link con una URL que no es alcanzable (no devuelve 200)
+        val response = shortUrl("https://www.google.com/sfdifhdskjfhsdkjfdusihfsdaih", false)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `Create shortened URL starting from a reachable URL`() {     
+        //hacemos un POST a /api/link con una URL que SI es alcanzable (devuelve 200)
+        val response = shortUrl("https://www.google.com/", false)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/tiny-cac87a2c"))
+        assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/tiny-cac87a2c"))
     }
 
     private fun shortUrl(url: String, qr:Boolean): ResponseEntity<ShortUrlDataOut> {

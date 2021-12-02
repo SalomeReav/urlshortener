@@ -125,13 +125,14 @@ class UrlShortenerControllerTest {
         given(createShortUrlUseCase.create(
             url = "http://notreachableurl.com/",
             data = ShortUrlProperties(ip = "127.0.0.1")
-        )).willAnswer { throw NonReachableUrlException ("http://notreachableurl.com/") }
-        mockMvc.perform(post("/api/link")
+        )).willAnswer { throw NotReachableUrlException ("http://notreachableurl.com/") }
+
+        mockMvc.perform(post("/api/link") 
             .param("url", "http://notreachableurl.com/")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
             .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.statusCode").value(400))
-    }
+            
+    } 
 
 
     @Test

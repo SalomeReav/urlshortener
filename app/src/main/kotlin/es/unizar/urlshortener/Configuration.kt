@@ -2,8 +2,8 @@ package es.unizar.urlshortener
 
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
+import es.unizar.urlshortener.infrastructure.delivery.ReachableServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
-import es.unizar.urlshortener.infrastructure.delivery.CheckReachableServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
@@ -16,9 +16,10 @@ import org.springframework.context.annotation.Configuration
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
- *
+ * 
  * **Note**: Spring Boot is able to discover this [Configuration] without further configuration.
  */
+
 @Configuration
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
@@ -40,8 +41,10 @@ class ApplicationConfiguration(
     @Bean
     fun hashService() = HashServiceImpl()
     
+
     @Bean
-    fun checkReachableService() = CheckReachableServiceImpl()
+    fun reachableService() = ReachableServiceImpl()
+
 
     @Bean
     fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
@@ -49,9 +52,6 @@ class ApplicationConfiguration(
     @Bean
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
-    @Bean
-    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), checkReachableService() )
-    
     @Bean
     fun createQrCodeUseCase() = CreateQrCodeUseCaseImpl(qrCodeRepositoryService())
 
@@ -66,7 +66,11 @@ class ApplicationConfiguration(
 
     @Bean
     fun getUsersCountUseCase() = GetUsersCountUseCaseImpl(clickRepositoryService())
+    
+    @Bean
+    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), reachableService())
 
+    
     @Bean
     fun limitRedirectUseCase() = LimitRedirectUseCaseImpl(clickRepositoryService())
 }

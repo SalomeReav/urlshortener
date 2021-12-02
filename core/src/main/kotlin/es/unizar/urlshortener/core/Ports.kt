@@ -44,10 +44,10 @@ interface HashService {
 }
 
 /**
- * [CheckReachableService] is the port to the service that check if an url is reacheble.
- *
- * **Note**: It is a design decision to create this port. It could be part of the core .
- */
-interface CheckReachableService {
+  * [ReachableService] is the port to the service that checks if an url is reachable so it can be shortened.
+  *
+  * **Note**: It is a design decision to create this port. It could be part of the core .
+  */
+  interface ReachableService {
     fun isReachable(url: String): Boolean
 }
