@@ -66,4 +66,7 @@ class ApplicationConfiguration(
 
     @Bean
     fun getUsersCountUseCase() = GetUsersCountUseCaseImpl(clickRepositoryService())
+
+    @Bean
+    fun limitRedirectUseCase() = LimitRedirectUseCaseImpl(clickRepositoryService())
 }

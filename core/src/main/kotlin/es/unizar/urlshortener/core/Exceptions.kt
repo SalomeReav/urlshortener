@@ -7,3 +7,6 @@ class NonReachableUrlException(val url: String) : Exception("[$url] is not reach
 class RedirectionNotFound(val key: String) : Exception("[$key] is not known")
 
 class QrCodeNotFound(val key: String) : Exception("[$key] is not known")
+
+class UnavailableUrl(val key: String) : Exception("[$key] is unavailable")
+

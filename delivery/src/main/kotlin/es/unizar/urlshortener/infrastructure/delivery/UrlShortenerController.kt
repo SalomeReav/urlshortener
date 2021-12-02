@@ -1,8 +1,6 @@
 ﻿package es.unizar.urlshortener.infrastructure.delivery
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import es.unizar.urlshortener.core.ClickProperties
-import es.unizar.urlshortener.core.ShortUrl
 import es.unizar.urlshortener.core.ShortUrlProperties
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -12,20 +10,10 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
 import javax.servlet.http.HttpServletRequest
-import boofcv.io.image.ConvertBufferedImage
-import java.awt.image.BufferedImage
 import boofcv.kotlin.asBufferedImage
-import boofcv.gui.image.ShowImages
-import boofcv.alg.fiducial.qrcode.QrCodeEncoder
-import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage
-import org.springframework.core.io.ClassPathResource
-import org.springframework.util.StreamUtils
-import boofcv.struct.image.GrayU8
-import boofcv.io.image.ConvertRaster
-import boofcv.io.image.UtilImageIO
+import es.unizar.urlshortener.core.UnavailableUrl
 import es.unizar.urlshortener.core.usecases.*
 import java.io.ByteArrayOutputStream
-import java.time.OffsetDateTime
 import javax.imageio.ImageIO
 
 
@@ -100,20 +88,23 @@ class UrlShortenerControllerImpl(
     val getQrImageUseCase: GetQrImageUseCase,
     val getClicksNumberUseCase: GetClicksNumberUseCase,
     val getClicksDayUseCase: GetClicksDayUseCase,
-    val getUsersCountUseCase: GetUsersCountUseCase
+    val getUsersCountUseCase: GetUsersCountUseCase,
+    val limitRedirectUseCase: LimitRedirectUseCase
 ) : UrlShortenerController {
 
     @GetMapping("/tiny-{id:.*}")
-    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void>
-        {
-            var response: ResponseEntity<Void>
-            redirectUseCase.redirectTo(id).let {
-                logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
-                val h = HttpHeaders()
-                h.location = URI.create(it.target)
-                response = ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
+    override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
+        limitRedirectUseCase.limitRedirectByDay(id).let {
+            if (it) {
+                redirectUseCase.redirectTo(id).let {
+                    logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
+                    val h = HttpHeaders()
+                    h.location = URI.create(it.target)
+                    return ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
+                }
+            } else {
+                throw UnavailableUrl(request.requestURL.toString())
             }
-            return response
         }
     @GetMapping("/qr/{id:.*}")
     override fun getQrImage(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> =

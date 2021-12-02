@@ -21,7 +21,7 @@ class GetClicksDayUseCaseImpl (
         var list = clickRepository
             .findByHash(hash)
             if (list.isEmpty()) throw RedirectionNotFound(hash)
-        val dateList = list.groupBy { it.created.format(DateTimeFormatter.ISO_LOCAL_DATE) }
-        return dateList.map { it.key to it.value.size }.toMap();
+        val clickByDateList = list.groupBy { it.created.format(DateTimeFormatter.ISO_LOCAL_DATE) }
+        return clickByDateList.map { it.key to it.value.size }.toMap();
     }
 }
