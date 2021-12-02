@@ -117,14 +117,15 @@ class UrlShortenerControllerImpl(
             }
 
     @GetMapping("/{id:.*}.json")
-    override fun getClicksInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClicksDataOut> {
-        val data = ClicksDataOut(
-            clicks = getClicksNumberUseCase.getClicksNumber(id),
-            users = getUsersCountUseCase.getUsersCount(id),
-            clicksByDay = getClicksDayUseCase.getClicksDay(id)
-        )
-        return ResponseEntity<ClicksDataOut>(data, HttpStatus.OK)
-    }
+    override fun getClicksInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClicksDataOut> =
+        redirectUseCase.redirectTo(id).let {
+            val data = ClicksDataOut(
+                clicks = getClicksNumberUseCase.getClicksNumber(id),
+                users = getUsersCountUseCase.getUsersCount(id),
+                clicksByDay = getClicksDayUseCase.getClicksDay(id)
+            )
+            return ResponseEntity<ClicksDataOut>(data, HttpStatus.OK)
+        }
 
     @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =

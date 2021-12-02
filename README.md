@@ -39,7 +39,7 @@ The application can be run as follows:
 Now you have a shortener service running at port 8080. You can test that it works as follows:
 
 ```shell
-$ curl -v -d "url=http://www.unizar.es/" http://localhost:8080/api/link
+curl -v -d "url=http://www.unizar.es/" http://localhost:8080/api/link
 *   Trying ::1:8080...
 * Connected to localhost (::1) port 8080 (#0)
 > POST /api/link HTTP/1.1
@@ -64,7 +64,7 @@ $ curl -v -d "url=http://www.unizar.es/" http://localhost:8080/api/link
 And now, we can navigate to the shortened URL.
 
 ```shell
-$ curl -v http://localhost:8080/tiny-6bb9db44
+curl -v http://localhost:8080/tiny-6bb9db44
 *   Trying ::1:8080...
 * Connected to localhost (::1) port 8080 (#0)
 > GET /tiny-6bb9db44 HTTP/1.1
@@ -84,7 +84,7 @@ $ curl -v http://localhost:8080/tiny-6bb9db44
 For test qrCode service:
 
 ```shell
-$ curl -v -d "url=http://www.unizar.es/" -d "createQR=true" http://localhost:8080/api/link
+curl -v -d "url=http://www.unizar.es/" -d "createQR=true" http://localhost:8080/api/link
 *   Trying ::1...
 * TCP_NODELAY set
 * Connected to localhost (::1) port 8080 (#0)
@@ -122,6 +122,24 @@ curl -v http://localhost:8080/qr/6bb9db44
 < Content-Length: 8323
 < Date: Tue, 30 Nov 2021 19:03:23 GMT   
 ```
+For test clicksInfo service:
+```shell
+curl -v http://localhost:8080/6bb9db44.json
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> GET /6bb9db44.json HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.55.1
+> Accept: */*
+>
+< HTTP/1.1 200
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Thu, 02 Dec 2021 12:25:47 GMT
+<
+{"clicks":0,"users":0,"clicksByDay":{}}* Connection #0 to host localhost left intact
+```
 
 ## Build and Run
 
@@ -150,7 +168,18 @@ The project offers a set of functionalities:
   
 * **Get QrCode Image**.
   See in `core` the use case `GetQrImageUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+
+* **Get Clicks Number**.
+  See in `core` the use case `GetClicksNumberUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+
+* **Get Clicks By Day**.
+  See in `core` the use case `GetClicksDayUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+
+* **Get Users Clicks**.
+  See in `core` the use case `GetUsersCountUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+
   
+
 The objects in the domain are:
 
 * `ShortUrl`: the minimum information about a short url
@@ -158,7 +187,7 @@ The objects in the domain are:
 * `ShortUrlProperties`: a handy way to extend data about a short url
 * `Click`: the minimum data captured when a redirection is logged
 * `ClickProperties`: a handy way to extend data about a click
-* `QrCode`:  the minimun information about a qrcode
+* `QrCode`:  the minimum information about a qrcode
 
 
 ## Delivery
@@ -168,6 +197,7 @@ The above functionality is available through a simple API:
 * `POST /api/link` which creates a short URL and a qrcode URL(if specified) from data send by a form.
 * `GET /tiny-{id}` where `id` identifies the short url, deals with redirects, and logs use (i.e. clicks).
 * `GET /qr/{id}` where `id` identifies the qrCode, returns a qrcode containing the short URL.
+* `GET /{id}.json` where `id` identifies the short url, returns a json with clicks information.
 
 In addition, `GET /` returns the landing page of the system. 
 

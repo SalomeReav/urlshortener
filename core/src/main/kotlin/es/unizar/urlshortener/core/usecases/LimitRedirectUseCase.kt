@@ -17,7 +17,7 @@ interface LimitRedirectUseCase {
 class LimitRedirectUseCaseImpl (
     private val clickRepository: ClickRepositoryService
 ) : LimitRedirectUseCase {
-    var LIMIT_BY_DAY = 3;
+    var LIMIT_BY_DAY = 10;
     override fun limitRedirectByDay(hash: String): Boolean {
         val clickByDateList = clickRepository.findByHash(hash)
             .groupBy { it.created.format(DateTimeFormatter.ISO_LOCAL_DATE) }

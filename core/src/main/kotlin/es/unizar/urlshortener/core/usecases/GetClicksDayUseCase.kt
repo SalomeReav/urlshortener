@@ -20,7 +20,7 @@ class GetClicksDayUseCaseImpl (
     override fun getClicksDay(hash: String): Map<String, Int> {
         var list = clickRepository
             .findByHash(hash)
-            if (list.isEmpty()) throw RedirectionNotFound(hash)
+        if (list.isEmpty()) return mutableMapOf<String,Int>();
         val clickByDateList = list.groupBy { it.created.format(DateTimeFormatter.ISO_LOCAL_DATE) }
         return clickByDateList.map { it.key to it.value.size }.toMap();
     }

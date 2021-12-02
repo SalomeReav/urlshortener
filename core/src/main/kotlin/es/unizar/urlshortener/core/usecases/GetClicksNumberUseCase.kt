@@ -17,7 +17,6 @@ class GetClicksNumberUseCaseImpl (
     ) : GetClicksNumberUseCase {
         override fun getClicksNumber(hash: String): Int {
             val numClick = clickRepository.countByHash(hash)
-            if ( numClick == 0 ) throw RedirectionNotFound(hash)
             return numClick
         }
     }

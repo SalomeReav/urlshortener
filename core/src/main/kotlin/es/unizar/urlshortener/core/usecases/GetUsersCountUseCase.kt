@@ -21,7 +21,7 @@ class GetUsersCountUseCaseImpl (
     ) : GetUsersCountUseCase {
         override fun getUsersCount(hash: String): Int {
             var list = clickRepository.findByHash(hash)
-            if (list.isEmpty()) throw RedirectionNotFound(hash)
+            if (list.isEmpty()) return 0
             return list.groupBy { it.properties.ip }.size;
         }
 }
