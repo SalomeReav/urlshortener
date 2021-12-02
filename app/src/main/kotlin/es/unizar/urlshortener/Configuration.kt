@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration
  * 
  * **Note**: Spring Boot is able to discover this [Configuration] without further configuration.
  */
+
 @Configuration
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
