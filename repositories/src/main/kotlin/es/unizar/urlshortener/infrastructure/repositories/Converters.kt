@@ -40,6 +40,8 @@ fun ShortUrlEntity.toDomain() = ShortUrl(
         target = target,
         mode = mode),
     created = created,
+    lastRedirect = lastRedirect,
+    redirectCount = redirectCount,
     properties = ShortUrlProperties(
         sponsor = sponsor,
         owner = owner,
@@ -57,11 +59,13 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
     target = redirection.target,
     mode = redirection.mode,
     created = created,
+    lastRedirect = lastRedirect,
+    redirectCount = redirectCount,
     owner = properties.owner,
     sponsor = properties.sponsor,
     safe = properties.safe,
     ip = properties.ip,
-    country = properties.country
+    country = properties.country,
 )
 
 /**

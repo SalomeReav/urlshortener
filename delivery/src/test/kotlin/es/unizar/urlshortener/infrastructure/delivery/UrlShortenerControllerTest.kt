@@ -17,9 +17,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.net.URI
 import boofcv.alg.fiducial.qrcode.QrCodeEncoder
 import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage
-import com.google.common.hash.Hashing
 import es.unizar.urlshortener.core.usecases.*
-import java.nio.charset.StandardCharsets
+
 @WebMvcTest
 @ContextConfiguration(classes = [
     UrlShortenerControllerImpl::class,
@@ -86,8 +85,8 @@ class UrlShortenerControllerTest {
     fun `redirectTo returns a service unavailable when the key exists but the limit has been reached`() {
         given(limitRedirectUseCase.limitRedirectByDay("key")).willReturn(false)
         mockMvc.perform(get("/tiny-{id}", "key"))
-            .andExpect(status().isServiceUnavailable)
-            .andExpect(jsonPath("$.statusCode").value(503))
+            .andExpect(status().isTooManyRequests)
+            .andExpect(jsonPath("$.statusCode").value(429))
     }
 
     @Test

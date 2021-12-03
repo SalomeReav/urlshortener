@@ -21,7 +21,9 @@ data class ShortUrl(
     val hash: String,
     val redirection: Redirection,
     val created: OffsetDateTime = OffsetDateTime.now(),
-    val properties: ShortUrlProperties = ShortUrlProperties()
+    val properties: ShortUrlProperties = ShortUrlProperties(),
+    var redirectCount: Int? = 0,
+    var lastRedirect: OffsetDateTime? = OffsetDateTime.now()
 )
 
 /**

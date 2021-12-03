@@ -2,7 +2,7 @@ package es.unizar.urlshortener.core.usecases
 
 
 import es.unizar.urlshortener.core.*
-import java.util.Date
+
 /**
  * Given an url returns the key that is used to create a short URL.
  * When the url is created optional data may be added.

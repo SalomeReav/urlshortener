@@ -6,6 +6,9 @@ import es.unizar.urlshortener.core.ShortUrl
 import es.unizar.urlshortener.core.ShortUrlRepositoryService
 import es.unizar.urlshortener.core.QrCode
 import es.unizar.urlshortener.core.QrCodeRepositoryService
+import org.springframework.data.jpa.repository.Modifying
+import java.time.OffsetDateTime
+
 /**
  * Implementation of the port [ClickRepositoryService].
  */

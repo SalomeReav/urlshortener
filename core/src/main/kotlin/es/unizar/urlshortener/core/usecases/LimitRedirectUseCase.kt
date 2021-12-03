@@ -15,18 +15,26 @@ interface LimitRedirectUseCase {
  * Implementation of [GetClicksDayUseCase].
  */
 class LimitRedirectUseCaseImpl (
-    private val clickRepository: ClickRepositoryService
+    private val shortUrlRepositoryService: ShortUrlRepositoryService
 ) : LimitRedirectUseCase {
     var LIMIT_BY_DAY = 10;
     override fun limitRedirectByDay(hash: String): Boolean {
-        val clickByDateList = clickRepository.findByHash(hash)
-            .groupBy { it.created.format(DateTimeFormatter.ISO_LOCAL_DATE) }
-        val numClicksByDate = clickByDateList.map { it.key to it.value.size }.toMap()
-        val todayClicks = numClicksByDate[OffsetDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE)]
-        var available = true
-        if (todayClicks != null) {
-            available = todayClicks < LIMIT_BY_DAY
+        var available = false
+        val dateFormat = DateTimeFormatter.ISO_LOCAL_DATE
+        val shortUrl = shortUrlRepositoryService.findByKey(hash)
+        if (shortUrl != null && shortUrl.redirectCount!! < LIMIT_BY_DAY) {
+            val now = OffsetDateTime.now()
+            if (shortUrl.lastRedirect?.format(dateFormat).equals(now.format(dateFormat))){
+                shortUrl.redirectCount = shortUrl.redirectCount?.plus(1)
+            }
+            else
+                shortUrl.redirectCount = 0
+            shortUrl.lastRedirect = now
+            shortUrlRepositoryService.save(shortUrl)
+            available = true
+            println("------"+shortUrl.redirectCount+"-----"+shortUrl.lastRedirect)
+
         }
-        return available;
+        return available
     }
 }

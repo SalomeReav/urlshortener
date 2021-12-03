@@ -70,7 +70,6 @@ class ApplicationConfiguration(
     @Bean
     fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), reachableService())
 
-    
     @Bean
-    fun limitRedirectUseCase() = LimitRedirectUseCaseImpl(clickRepositoryService())
+    fun limitRedirectUseCase() = LimitRedirectUseCaseImpl(shortUrlRepositoryService())
 }

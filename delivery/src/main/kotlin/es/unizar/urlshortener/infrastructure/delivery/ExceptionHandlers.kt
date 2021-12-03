@@ -38,8 +38,8 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ResponseBody
     @ExceptionHandler(value = [UnavailableUrl::class])
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    protected fun unavailableUrl(ex: UnavailableUrl) = ErrorMessage(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.message)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    protected fun unavailableUrl(ex: UnavailableUrl) = ErrorMessage(HttpStatus.TOO_MANY_REQUESTS.value(), ex.message)
 
     @ExceptionHandler(value = [NotReachableUrlException::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
