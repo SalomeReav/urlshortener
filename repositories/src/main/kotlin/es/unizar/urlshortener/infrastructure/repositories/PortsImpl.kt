@@ -6,6 +6,9 @@ import es.unizar.urlshortener.core.ShortUrl
 import es.unizar.urlshortener.core.ShortUrlRepositoryService
 import es.unizar.urlshortener.core.QrCode
 import es.unizar.urlshortener.core.QrCodeRepositoryService
+import org.springframework.data.jpa.repository.Modifying
+import java.time.OffsetDateTime
+
 /**
  * Implementation of the port [ClickRepositoryService].
  */
@@ -13,6 +16,12 @@ class ClickRepositoryServiceImpl(
     private val clickEntityRepository: ClickEntityRepository
 ) : ClickRepositoryService {
     override fun save(cl: Click): Click = clickEntityRepository.save(cl.toEntity()).toDomain()
+    override fun findByHash(hash: String): List<Click> {
+        return clickEntityRepository.findByHash(hash).map {  Click(hash = it.hash, created = it.created) }
+    }
+    override fun countByHash(hash:String): Int{
+        return clickEntityRepository.countByHash(hash)
+    }
 }
 
 /**
