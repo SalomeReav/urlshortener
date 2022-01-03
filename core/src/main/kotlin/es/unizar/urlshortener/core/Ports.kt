@@ -1,7 +1,7 @@
 package es.unizar.urlshortener.core
 
 import java.time.OffsetDateTime
-
+import java.util.concurrent.CompletableFuture
 /**
  * [ClickRepositoryService] is the port to the repository that provides persistence to [Clicks][Click].
  */
@@ -32,8 +32,9 @@ interface QrCodeRepositoryService {
  *
  * **Note**: It is a design decision to create this port. It could be part of the core .
  */
-interface ValidatorService {
+interface ValidatorService  {
     fun isValid(url: String): Boolean
+    fun isReachable(url : String) : CompletableFuture<Boolean>
 }
 
 /**
@@ -43,13 +44,4 @@ interface ValidatorService {
  */
 interface HashService {
     fun hasUrl(url: String): String
-}
-
-/**
-  * [ReachableService] is the port to the service that checks if an url is reachable so it can be shortened.
-  *
-  * **Note**: It is a design decision to create this port. It could be part of the core .
-  */
-  interface ReachableService {
-    fun isReachable(url: String): Boolean
 }

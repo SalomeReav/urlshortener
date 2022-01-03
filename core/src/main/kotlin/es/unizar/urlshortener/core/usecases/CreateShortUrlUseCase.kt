@@ -1,7 +1,9 @@
 package es.unizar.urlshortener.core.usecases
 
-
 import es.unizar.urlshortener.core.*
+
+import java.util.Date
+import java.util.concurrent.CompletableFuture
 
 /**
  * Given an url returns the key that is used to create a short URL.
@@ -15,42 +17,41 @@ interface CreateShortUrlUseCase {
 
 /**
  * Implementation of [CreateShortUrlUseCase].
- */
+ */  
 class CreateShortUrlUseCaseImpl(
     private val shortUrlRepository: ShortUrlRepositoryService,
     private val validatorService: ValidatorService,
-    private val hashService: HashService,
-    private val reachableService: ReachableService
+    private val hashService: HashService
 ) : CreateShortUrlUseCase {
-    override fun create(url: String, data: ShortUrlProperties): ShortUrl =
-        if (validatorService.isValid(url)) {
-// no puedo hacer las cosas aqui tengo que coger el ejemplo de validatorService(implementado en delivery
-//) además para hacerlo asincrono en kotlin hay corrutinas y no se donde algo se asinc
-//lo primero que hay que hacer es q pase lo que se cree el link acortado y despues ya el validador se encargue de decir si se puede usar o no
-/*val client = HttpClient.newBuilder().build();
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .build();
-            
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != 200){
+    override fun create(url: String, data: ShortUrlProperties): ShortUrl {
+        if (!validatorService.isValid(url)) {
             throw InvalidUrlException(url)
-        }
-//nuevo*/
-            if (reachableService.isReachable(url)){
-                val id: String = hashService.hasUrl(url)
-                val su = ShortUrl(
-                    hash = id,
-                    redirection = Redirection(target = url),
-                    properties = ShortUrlProperties(
-                        safe = data.safe,
-                        ip = data.ip,
-                        sponsor = data.sponsor
-                    )
-                )
-                shortUrlRepository.save(su)
-            } else throw NotReachableUrlException(url)
         } else {
-            throw InvalidUrlException(url)
+            val reachable = validatorService.isReachable(url)
+            val id: String = hashService.hasUrl(url)
+            val su = ShortUrl(
+                hash = id,
+                redirection = Redirection(target = url),
+                properties = ShortUrlProperties(
+                    safe = data.safe,
+                    ip = data.ip,
+                    sponsor = data.sponsor,
+                )
+            )
+            val suReturned = shortUrlRepository.save(su)
+            reachable.handleAsync { _, _ ->
+                val shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
+                if(shortUrlSaved != null) {
+                    if(reachable.isCompletedExceptionally) {
+                        shortUrlSaved.properties.reachable = false
+                    } else {
+                        shortUrlSaved.properties.reachable = reachable.getNow(false)
+                    }
+                    shortUrlRepository.save(shortUrlSaved)
+                }
+            }
+            return suReturned
         }
+    }
+
 }

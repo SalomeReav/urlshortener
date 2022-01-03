@@ -1,6 +1,6 @@
 package es.unizar.urlshortener
 
-import es.unizar.urlshortener.infrastructure.delivery.ClicksDataOut
+import es.unizar.urlshortener.infrastructure.delivery.*
 import es.unizar.urlshortener.infrastructure.delivery.ShortUrlDataOut
 import org.apache.http.impl.client.HttpClientBuilder
 import org.assertj.core.api.Assertions.assertThat
@@ -26,6 +26,11 @@ import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import java.net.URI
 
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class HttpRequestTest {
@@ -37,6 +42,11 @@ class HttpRequestTest {
 
     @Autowired
     private lateinit var restTemplate: TestRestTemplate
+
+    @Autowired
+    private val executor: ThreadPoolTaskExecutor? = null
+
+
 
     @BeforeEach
     fun setup() {
@@ -190,10 +200,12 @@ class HttpRequestTest {
         data["url"] = url
         if(qr) data["createQR"] = "true"
             
-        return restTemplate.postForEntity(
+        val response =  restTemplate.postForEntity(
             "http://localhost:$port/api/link",
             HttpEntity(data, headers), ShortUrlDataOut::class.java
         )
+        executor?.getThreadPoolExecutor()?.awaitTermination(3, TimeUnit.SECONDS);
+        return response
     }
 
 }

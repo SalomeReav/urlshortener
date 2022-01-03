@@ -1,7 +1,6 @@
 ﻿package es.unizar.urlshortener.infrastructure.delivery
 
-import es.unizar.urlshortener.core.ClickProperties
-import es.unizar.urlshortener.core.ShortUrlProperties
+import es.unizar.urlshortener.core.*
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -89,7 +88,8 @@ class UrlShortenerControllerImpl(
     val getClicksNumberUseCase: GetClicksNumberUseCase,
     val getClicksDayUseCase: GetClicksDayUseCase,
     val getUsersCountUseCase: GetUsersCountUseCase,
-    val limitRedirectUseCase: LimitRedirectUseCase
+    val limitRedirectUseCase: LimitRedirectUseCase,
+    private val validatorService: ValidatorService
 ) : UrlShortenerController {
 
     @GetMapping("/tiny-{id:.*}")

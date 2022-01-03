@@ -4,7 +4,6 @@ import es.unizar.urlshortener.core.*
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import es.unizar.urlshortener.core.NotReachableUrlException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
@@ -41,9 +40,11 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
     protected fun unavailableUrl(ex: UnavailableUrl) = ErrorMessage(HttpStatus.TOO_MANY_REQUESTS.value(), ex.message)
 
-    @ExceptionHandler(value = [NotReachableUrlException::class])
+    @ResponseBody
+    @ExceptionHandler(value = [UrlNotReachable::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun uriNotReachable(ex: NotReachableUrlException) = ErrorMessageReachable(HttpStatus.BAD_REQUEST.value(), ex.message)
+    protected fun urlNotReachable(ex: UrlNotReachable) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
+
 }
 
 data class ErrorMessage(
