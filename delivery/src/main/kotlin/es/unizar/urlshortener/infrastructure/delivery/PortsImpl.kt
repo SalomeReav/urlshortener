@@ -38,6 +38,7 @@ open class ValidatorServiceImpl : ValidatorService {
             response = try { client.get(url) }
             catch (e: Exception) { null }
         }
+        
         return CompletableFuture.completedFuture(response?.status == HttpStatusCode.OK)
     }
 
