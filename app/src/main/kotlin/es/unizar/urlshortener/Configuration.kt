@@ -1,7 +1,7 @@
 package es.unizar.urlshortener
 
 import es.unizar.urlshortener.core.usecases.*
-import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
+import es.unizar.urlshortener.infrastructure.delivery.*
 import es.unizar.urlshortener.infrastructure.repositories.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -15,7 +15,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
  * 
  * **Note**: Spring Boot is able to discover this [Configuration] without further configuration.
  */
-
+/*org.springframework.beans.factory.NoSuchBeanDefinitionException: No bean named 'taskExecutorReachable' available: No matching Executor bean found for qualifier 'taskExecutorReachable' - neither qualifier match nor bean name match! */
 
 /* Information about asyncExecutor : https://howtodoinjava.com/spring-boot2/rest/enableasync-async-controller/
 * */
@@ -23,15 +23,26 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 @Configuration
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
-    @Autowired val clickEntityRepository: ClickEntityRepository
+    @Autowired val clickEntityRepository: ClickEntityRepository,
+    @Autowired val qrCodeEntityRepository: QrCodeEntityRepository,
 )  {
 
-    @Bean
+    @Bean(name = ["taskExecutorUriInformation"])
+    fun executorTask(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
+        executor.initialize()
+        return executor
+    }
+
+    @Bean(name = ["taskExecutorReachable"])
     fun taskExecutor(): Executor? {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 4;
-        executor.maxPoolSize = 10;
-        executor.setQueueCapacity(150);
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
         executor.initialize()
         return executor
     }

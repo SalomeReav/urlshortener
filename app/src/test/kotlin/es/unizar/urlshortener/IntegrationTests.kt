@@ -176,21 +176,6 @@ class HttpRequestTest {
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
 
-    @Test
-    fun `Create shortened URL starting from a not reachable URL`() {
-        //hacemos un POST a /api/link con una URL que no es alcanzable (no devuelve 200)
-        val response = shortUrl("https://www.google.com/sfdifhdskjfhsdkjfdusihfsdaih", false)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-    }
-
-    @Test
-    fun `Create shortened URL starting from a reachable URL`() {     
-        //hacemos un POST a /api/link con una URL que SI es alcanzable (devuelve 200)
-        val response = shortUrl("https://www.google.com/", false)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
-        assertThat(response.headers.location).isEqualTo(URI.create("http://localhost:$port/tiny-cac87a2c"))
-        assertThat(response.body?.url).isEqualTo(URI.create("http://localhost:$port/tiny-cac87a2c"))
-    }
 
     private fun shortUrl(url: String, qr:Boolean): ResponseEntity<ShortUrlDataOut> {
         val headers = HttpHeaders()

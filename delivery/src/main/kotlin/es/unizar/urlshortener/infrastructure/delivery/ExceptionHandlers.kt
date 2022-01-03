@@ -52,9 +52,3 @@ data class ErrorMessage(
     val message: String?,
     val timestamp: String = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now())
 )
-
-data class ErrorMessageReachable(
-    val statusCode: Int,
-    val error: String?,
-    val timestamp: String = DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now())
-)
