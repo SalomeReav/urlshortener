@@ -22,7 +22,8 @@ import es.unizar.urlshortener.core.usecases.*
 @WebMvcTest
 @ContextConfiguration(classes = [
     UrlShortenerControllerImpl::class,
-    RestResponseEntityExceptionHandler::class])
+    RestResponseEntityExceptionHandler::class,
+    ValidatorServiceImpl::class])
 class UrlShortenerControllerTest {
 
     @Autowired
@@ -124,7 +125,7 @@ class UrlShortenerControllerTest {
         given(createShortUrlUseCase.create(
             url = "http://notreachableurl.com/",
             data = ShortUrlProperties(ip = "127.0.0.1")
-        )).willAnswer { throw NotReachableUrlException ("http://notreachableurl.com/") }
+        )).willAnswer { throw UrlNotReachable ("http://notreachableurl.com/") }
 
         mockMvc.perform(post("/api/link") 
             .param("url", "http://notreachableurl.com/")
