@@ -26,32 +26,31 @@ class CreateShortUrlUseCaseImpl(
     override fun create(url: String, data: ShortUrlProperties): ShortUrl {
         if (!validatorService.isValid(url)) {
             throw InvalidUrlException(url)
-        } else {
-            val reachable = validatorService.isReachable(url)
-            val id: String = hashService.hasUrl(url)
-            val su = ShortUrl(
-                hash = id,
-                redirection = Redirection(target = url),
-                properties = ShortUrlProperties(
-                    safe = data.safe,
-                    ip = data.ip,
-                    sponsor = data.sponsor,
-                )
-            )
-            val suReturned = shortUrlRepository.save(su)
-            reachable.handleAsync { _, _ ->
-                val shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
-                if(shortUrlSaved != null) {
-                    if(reachable.isCompletedExceptionally) {
-                        shortUrlSaved.properties.reachable = false
-                    } else {
-                        shortUrlSaved.properties.reachable = reachable.getNow(false)
-                    }
-                    shortUrlRepository.save(shortUrlSaved)
-                }
-            }
-            return suReturned
         }
+        val id: String = hashService.hasUrl(url)
+        val reachable = validatorService.isReachable(url)
+        val su = ShortUrl(
+            hash = id,
+            redirection = Redirection(target = url),
+            properties = ShortUrlProperties(
+                safe = data.safe,
+                ip = data.ip,
+                sponsor = data.sponsor,
+            )
+        )
+        val suReturned = shortUrlRepository.save(su)
+        reachable.handleAsync { _, _ ->
+            val shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
+            if (shortUrlSaved != null) {
+                if (reachable.isCompletedExceptionally) {
+                    shortUrlSaved.properties.reachable = false
+                } else {
+                    shortUrlSaved.properties.reachable = reachable.getNow(false)
+                }
+                shortUrlSaved.properties.checked = true
+                shortUrlRepository.save(shortUrlSaved)
+            }
+        }
+        return suReturned
     }
-
-}
+} 

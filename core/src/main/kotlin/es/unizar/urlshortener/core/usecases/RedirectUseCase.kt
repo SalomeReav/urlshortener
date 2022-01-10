@@ -22,7 +22,9 @@ class RedirectUseCaseImpl(
         val su : ShortUrl? = shortUrlRepository.findByKey(key)
         val redirection : Redirection = su?.redirection
             ?: throw RedirectionNotFound(key)
-        if (!su.properties.reachable) {
+        if (!su.properties.checked) {
+                throw UrlNotChecked(redirection.target)
+            } else if (su.properties.checked && !su.properties.reachable) {
             throw UrlNotReachable(redirection.target)
         }
         return redirection

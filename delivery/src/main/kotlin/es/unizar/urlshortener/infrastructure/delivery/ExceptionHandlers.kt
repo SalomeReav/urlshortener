@@ -45,6 +45,11 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun urlNotReachable(ex: UrlNotReachable) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 
+    @ResponseBody
+    @ExceptionHandler(value = [UrlNotChecked::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun urlNotValidatedYet(ex: UrlNotChecked) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
+
 }
 
 data class ErrorMessage(

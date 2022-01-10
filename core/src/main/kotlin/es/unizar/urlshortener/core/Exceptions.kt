@@ -9,3 +9,5 @@ class QrCodeNotFound(val key: String) : Exception("[$key] is not known")
 class UnavailableUrl(val key: String) : Exception("[$key] is unavailable")
 
 class UrlNotReachable(val url: String) : Exception("[$url] is not reachable")
+
+class UrlNotChecked(val url: String) : Exception("[$url] has not been checked")
