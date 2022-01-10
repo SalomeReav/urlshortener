@@ -6,8 +6,9 @@ class CheckURLSafeServiceImpl(
 
 ): CheckURLSafeService {
     override fun checkUrlSafe(url: String): Boolean {
+        
         val apiUrl =
-            "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyDbt-GA2ZnFEmwgxO7hPlV3MkWWdmg_180"
+            "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyDd8lcmHyHjn6hi3DoFgNVn2Exs4nk1oYM"
         val headers = mapOf(
             "Content-Type" to "application/json"
         )
@@ -21,7 +22,7 @@ class CheckURLSafeServiceImpl(
                 "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING"],
                 "platformTypes": ["WINDOWS"],
                 "threatEntryTypes": ["URL"],
-                "threatEntries": [{"url": """ + url + """},]
+                "threatEntries": [{"url": "$url"},]
             }
         }""".trimIndent()
 
