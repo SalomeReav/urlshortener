@@ -12,6 +12,8 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.validator.routines.UrlValidator
 import org.springframework.scheduling.annotation.Async
+import java.net.HttpURLConnection
+import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.CompletableFuture
 
@@ -78,6 +80,7 @@ open class ValidatorServiceImpl : ValidatorService {
                 }
             }
             responseBody = connection.inputStream.use { it.readBytes() }.toString(Charsets.UTF_8)
+            println("RESPONSE--"+responseBody)
         }
 
         return CompletableFuture.completedFuture(responseBody == "{}")

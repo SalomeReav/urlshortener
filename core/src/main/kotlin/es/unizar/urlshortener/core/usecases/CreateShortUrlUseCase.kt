@@ -50,15 +50,20 @@ class CreateShortUrlUseCaseImpl(
             }
         }
         safe.handleAsync { _, _ ->
-            val shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
+            var shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
             if (shortUrlSaved != null) {
                 if (safe.isCompletedExceptionally) {
-                    shortUrlSaved.properties.safeSpam = false
+                    shortUrlSaved.properties.safe = false
                 } else {
-                    shortUrlSaved.properties.safeSpam = safe.getNow(false)
+                    shortUrlSaved.properties.safe = safe.getNow(false)
                 }
                 shortUrlSaved.properties.checkedSafe = true
+                println("SAFE--"+shortUrlSaved.properties.toString())
                 shortUrlRepository.save(shortUrlSaved)
+
+
+                shortUrlSaved = shortUrlRepository.findByKey(id)
+
             }
         }
 

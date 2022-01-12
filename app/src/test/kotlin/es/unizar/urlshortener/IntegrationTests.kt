@@ -38,7 +38,6 @@ class HttpRequestTest {
     @Qualifier("taskExecutor")
     private val executor: ThreadPoolTaskExecutor? = null
 
-
     @BeforeEach
     fun setup() {
         val httpClient = HttpClientBuilder.create()
@@ -178,7 +177,7 @@ class HttpRequestTest {
             "http://localhost:$port/api/link",
             HttpEntity(data, headers), ShortUrlDataOut::class.java
         )
-        executor?.getThreadPoolExecutor()?.awaitTermination(3, TimeUnit.SECONDS);
+        executor?.threadPoolExecutor?.awaitTermination(3, TimeUnit.SECONDS);
         return response
     }
 

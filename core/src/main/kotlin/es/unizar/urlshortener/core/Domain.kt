@@ -48,13 +48,12 @@ data class Redirection(
 data class ShortUrlProperties(
     val ip: String? = null,
     val sponsor: String? = null,
-    val safe: Boolean = true,
+    var safe: Boolean = true,
+    var checkedSafe:Boolean = false,
     var checked: Boolean = false,
     var reachable: Boolean = false,
     val owner: String? = null,
     val country: String? = null,
-    var safeSpam: Boolean = false,
-    var checkedSafe:Boolean = false,
 )
 
 /**

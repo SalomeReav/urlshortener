@@ -49,6 +49,11 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [QrCodeNotCreated::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun urlNotCreatedYet(ex: QrCodeNotCreated) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
+
+    @ResponseBody
+    @ExceptionHandler(value = [UrlNotSafe::class])
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun urlNotSafe(ex: UrlNotSafe) = ErrorMessage(HttpStatus.BAD_REQUEST.value(), ex.message)
 }
 
 data class ErrorMessage(

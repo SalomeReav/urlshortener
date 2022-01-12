@@ -61,6 +61,16 @@ class ApplicationConfiguration(
         return executor
     }
 
+    @Bean(name = ["taskExecutorSafe"])
+    fun taskExecutorSafe(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
+        executor.initialize()
+        return executor
+    }
+
     @Bean
     fun qrQueue(): BlockingQueue<String>? {
         return ArrayBlockingQueue<String>(10)
