@@ -53,7 +53,9 @@ data class ShortUrlProperties(
     var checked: Boolean = false,
     var reachable: Boolean = false,
     val owner: String? = null,
-    val country: String? = null
+    val country: String? = null,
+    var safeSpam: Boolean = false,
+    var checkedSafe:Boolean = false,
 )
 
 /**

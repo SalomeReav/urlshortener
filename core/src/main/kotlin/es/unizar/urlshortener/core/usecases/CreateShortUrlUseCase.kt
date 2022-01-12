@@ -29,6 +29,7 @@ class CreateShortUrlUseCaseImpl(
         }
         val id: String = hashService.hasUrl(url)
         val reachable = validatorService.isReachable(url)
+        val safe = validatorService.checkUrlSafe(url)
         val su = ShortUrl(
             hash = id,
             redirection = Redirection(target = url),
@@ -51,6 +52,19 @@ class CreateShortUrlUseCaseImpl(
                 shortUrlRepository.save(shortUrlSaved)
             }
         }
+        safe.handleAsync { _, _ ->
+            val shortUrlSaved: ShortUrl? = shortUrlRepository.findByKey(id)
+            if (shortUrlSaved != null) {
+                if (safe.isCompletedExceptionally) {
+                    shortUrlSaved.properties.safeSpam = false
+                } else {
+                    shortUrlSaved.properties.safeSpam = safe.getNow(false)
+                }
+                shortUrlSaved.properties.checkedSafe = true
+                shortUrlRepository.save(shortUrlSaved)
+            }
+        }
+
         return suReturned
     }
 } 
