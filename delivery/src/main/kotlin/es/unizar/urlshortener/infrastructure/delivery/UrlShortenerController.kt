@@ -1,19 +1,20 @@
 ﻿package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.*
+import es.unizar.urlshortener.core.usecases.*
+import kotlinx.coroutines.*
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.*
 import java.net.URI
+import java.util.concurrent.*
 import javax.servlet.http.HttpServletRequest
-import boofcv.kotlin.asBufferedImage
-import es.unizar.urlshortener.core.UnavailableUrl
-import es.unizar.urlshortener.core.usecases.*
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
+import kotlin.concurrent.thread
 
 
 /**
@@ -34,12 +35,14 @@ interface UrlShortenerController {
      * **Note**: Delivery of use case [CreateShortUrlUseCase].
      */
     fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut>
+
     /**
      * Returns a image from a url identified by it [id].
      *
      * **Note**: Delivery of use case [GetQrImageUseCase].
      */
     fun getQrImage(id: String, request: HttpServletRequest): ResponseEntity<ByteArray>
+
     /**
      * Returns the clicks number, clicks number filtered by date and the users count who
      * pressed on a url identified by it [id]
@@ -89,8 +92,18 @@ class UrlShortenerControllerImpl(
     val getClicksDayUseCase: GetClicksDayUseCase,
     val getUsersCountUseCase: GetUsersCountUseCase,
     val limitRedirectUseCase: LimitRedirectUseCase,
-    private val validatorService: ValidatorService
+    private val validatorService: ValidatorService,
+    val qrQueue: BlockingQueue<String>,
 ) : UrlShortenerController {
+
+    @Autowired
+    @Async("taskExecutorQrCode")
+    fun startQrConsumers() {
+        for (i in 0..3)
+            thread {
+                QRConsumer(qrQueue, createQrCodeUseCase).run()
+            }
+    }
 
     @GetMapping("/tiny-{id:.*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
@@ -106,15 +119,18 @@ class UrlShortenerControllerImpl(
                 throw UnavailableUrl(request.requestURL.toString())
             }
         }
+
     @GetMapping("/qr/{id:.*}")
     override fun getQrImage(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ByteArray> =
-            getQrImageUseCase.getQrImage(id).let {
-                val h = HttpHeaders()
-                h.contentType = MediaType.IMAGE_PNG
-                val baos = ByteArrayOutputStream()
-                ImageIO.write(it.gray?.asBufferedImage(), "png", baos)
-                ResponseEntity<ByteArray>(baos.toByteArray(), h, HttpStatus.OK)
+        getQrImageUseCase.getQrImage(id).let {
+            val h = HttpHeaders()
+            h.contentType = MediaType.IMAGE_PNG
+            if (it.image == null) {
+                val qr = createQrCodeUseCase.createQRImage(URI(it.url))
+                ResponseEntity<ByteArray>(qr.image, h, HttpStatus.OK)
             }
+            ResponseEntity<ByteArray>(it.image, h, HttpStatus.OK)
+        }
 
     @GetMapping("/{id:.*}.json")
     override fun getClicksInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClicksDataOut> =
@@ -127,7 +143,7 @@ class UrlShortenerControllerImpl(
             return ResponseEntity<ClicksDataOut>(data, HttpStatus.OK)
         }
 
-    @PostMapping("/api/link", consumes = [ MediaType.APPLICATION_FORM_URLENCODED_VALUE ])
+    @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
             url = data.url,
@@ -145,10 +161,11 @@ class UrlShortenerControllerImpl(
                     "safe" to it.properties.safe
                 )
             )
-            if(data.createQR == true){
-                createQrCodeUseCase.create(url).let{
-                   response.qr = linkTo<UrlShortenerControllerImpl> { getQrImage(it.hash, request) }.toUri()     
-				}
+            if (data.createQR == true) {
+                createQrCodeUseCase.create(url).let { qc ->
+                    response.qr = linkTo<UrlShortenerControllerImpl> { getQrImage(qc.hash, request) }.toUri()
+                    qrQueue.put(qc.url)
+                }
             }
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }

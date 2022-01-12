@@ -1,14 +1,14 @@
 package es.unizar.urlshortener.core
 
-import java.time.OffsetDateTime
 import java.util.concurrent.CompletableFuture
+
 /**
  * [ClickRepositoryService] is the port to the repository that provides persistence to [Clicks][Click].
  */
 interface ClickRepositoryService {
     fun save(cl: Click): Click
     fun findByHash(hash: String): List<Click>
-    fun countByHash(hash:String): Int
+    fun countByHash(hash: String): Int
 }
 
 /**
@@ -32,7 +32,7 @@ interface QrCodeRepositoryService {
  *
  * **Note**: It is a design decision to create this port. It could be part of the core .
  */
-interface ValidatorService  {
+interface ValidatorService {
     fun isValid(url: String): Boolean
     fun isReachable(url : String) : CompletableFuture<Boolean>
     fun checkUrlSafe(url : String) : CompletableFuture<Boolean>

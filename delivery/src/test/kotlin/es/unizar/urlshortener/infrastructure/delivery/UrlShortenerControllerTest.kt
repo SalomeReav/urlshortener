@@ -1,5 +1,10 @@
 package es.unizar.urlshortener.infrastructure.delivery
+
+import boofcv.alg.fiducial.qrcode.QrCodeEncoder
+import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage
+import boofcv.kotlin.asBufferedImage
 import es.unizar.urlshortener.core.*
+import es.unizar.urlshortener.core.usecases.*
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
@@ -14,16 +19,18 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.io.ByteArrayOutputStream
 import java.net.URI
-import boofcv.alg.fiducial.qrcode.QrCodeEncoder
-import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage
-import es.unizar.urlshortener.core.usecases.*
+import java.util.concurrent.BlockingQueue
+import javax.imageio.ImageIO
 
 @WebMvcTest
-@ContextConfiguration(classes = [
-    UrlShortenerControllerImpl::class,
-    RestResponseEntityExceptionHandler::class,
-    ValidatorServiceImpl::class])
+@ContextConfiguration(
+    classes = [
+        UrlShortenerControllerImpl::class,
+        RestResponseEntityExceptionHandler::class,
+        ValidatorServiceImpl::class]
+)
 class UrlShortenerControllerTest {
 
     @Autowired
@@ -55,6 +62,10 @@ class UrlShortenerControllerTest {
 
     @MockBean
     private lateinit var limitRedirectUseCase: LimitRedirectUseCase
+
+    @MockBean
+    private lateinit var qrQueue: BlockingQueue<String>
+
 
     @Test
     fun `redirectTo returns a redirect when the key exists`() {
@@ -92,14 +103,18 @@ class UrlShortenerControllerTest {
 
     @Test
     fun `creates returns a basic redirect if it can compute a hash`() {
-        given(createShortUrlUseCase.create(
-            url = "http://example.com/",
-            data = ShortUrlProperties(ip = "127.0.0.1")
-        )).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/")))
+        given(
+            createShortUrlUseCase.create(
+                url = "http://example.com/",
+                data = ShortUrlProperties(ip = "127.0.0.1")
+            )
+        ).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/")))
 
-        mockMvc.perform(post("/api/link")
-            .param("url", "http://example.com/")
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+        mockMvc.perform(
+            post("/api/link")
+                .param("url", "http://example.com/")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        )
             .andDo(print())
             .andExpect(status().isCreated)
             .andExpect(redirectedUrl("http://localhost/tiny-f684a3c4"))
@@ -108,38 +123,46 @@ class UrlShortenerControllerTest {
 
     @Test
     fun `creates returns bad request if it can compute a hash`() {
-        given(createShortUrlUseCase.create(
-            url = "ftp://example.com/",
-            data = ShortUrlProperties(ip = "127.0.0.1")
-        )).willAnswer { throw InvalidUrlException( "ftp://example.com/") }
+        given(
+            createShortUrlUseCase.create(
+                url = "ftp://example.com/",
+                data = ShortUrlProperties(ip = "127.0.0.1")
+            )
+        ).willAnswer { throw InvalidUrlException("ftp://example.com/") }
 
-        mockMvc.perform(post("/api/link")
-            .param("url", "ftp://example.com/")
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+        mockMvc.perform(
+            post("/api/link")
+                .param("url", "ftp://example.com/")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        )
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.statusCode").value(400))
     }
 
     @Test
     fun `creates returns bad request if it url not reachable`() {
-        given(createShortUrlUseCase.create(
-            url = "http://notreachableurl.com/",
-            data = ShortUrlProperties(ip = "127.0.0.1")
-        )).willAnswer { throw UrlNotReachable ("http://notreachableurl.com/") }
+        given(
+            createShortUrlUseCase.create(
+                url = "http://notreachableurl.com/",
+                data = ShortUrlProperties(ip = "127.0.0.1")
+            )
+        ).willAnswer { throw UrlNotReachable("http://notreachableurl.com/") }
 
-        mockMvc.perform(post("/api/link") 
-            .param("url", "http://notreachableurl.com/")
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+        mockMvc.perform(
+            post("/api/link")
+                .param("url", "http://notreachableurl.com/")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        )
             .andExpect(status().isBadRequest)
-            
-    } 
+
+    }
 
 
     @Test
     fun `clicksInfo returns a json with clicks, users and clicksByDay when the key exists`() {
         given(getClicksNumberUseCase.getClicksNumber("key", "user")).willReturn(0)
         given(getUsersCountUseCase.getUsersCount("key", "user")).willReturn(0)
-        given(getClicksDayUseCase.getClicksDay("key", "user")).willReturn(mutableMapOf<String,Int>())
+        given(getClicksDayUseCase.getClicksDay("key", "user")).willReturn(mutableMapOf<String, Int>())
         mockMvc.perform(get("/{id}.json", "key"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.clicks").value(0))
@@ -148,19 +171,25 @@ class UrlShortenerControllerTest {
     }
 
     @Test
-    fun `creates returns a qrCode url if specified `(){
-        given(createShortUrlUseCase.create(
-            url = "http://www.unizar.es/",
-            data = ShortUrlProperties(ip = "127.0.0.1")
-        )).willReturn(ShortUrl("6bb9db44", Redirection("http://www.unizar.es/")))
-        given(createQrCodeUseCase.create(
-            url = URI.create("http://localhost/tiny-6bb9db44"),
-        )).willReturn(qrCode(URI.create("http://localhost/tiny-6bb9db44")))
+    fun `creates returns a qrCode url if specified `() {
+        given(
+            createShortUrlUseCase.create(
+                url = "http://www.unizar.es/",
+                data = ShortUrlProperties(ip = "127.0.0.1")
+            )
+        ).willReturn(ShortUrl("6bb9db44", Redirection("http://www.unizar.es/")))
+        given(
+            createQrCodeUseCase.create(
+                url = URI.create("http://localhost/tiny-6bb9db44"),
+            )
+        ).willReturn(qrCode(URI.create("http://localhost/tiny-6bb9db44")))
 
-        mockMvc.perform(post("/api/link")
-            .param("url", "http://www.unizar.es/")
-            .param("createQR", "true")
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+        mockMvc.perform(
+            post("/api/link")
+                .param("url", "http://www.unizar.es/")
+                .param("createQR", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        )
             .andDo(print())
             .andExpect(status().isCreated)
             .andExpect(redirectedUrl("http://localhost/tiny-6bb9db44"))
@@ -168,9 +197,10 @@ class UrlShortenerControllerTest {
             .andExpect(jsonPath("$.qr").value("http://localhost/qr/6bb9db44"))
     }
 
-     @Test
+    @Test
     fun `getQrImage returns a image when the key exists`() {
-        given(getQrImageUseCase.getQrImage("key")
+        given(
+            getQrImageUseCase.getQrImage("key")
         ).willReturn(qrCode(URI.create("http://localhost/tiny-6bb9db44")))
 
         mockMvc.perform(get("/qr/{id}", "key"))
@@ -192,10 +222,22 @@ class UrlShortenerControllerTest {
         val qr = QrCodeEncoder().addAutomatic(url.toString()).fixate()
         val generator = QrCodeGeneratorImage(15).render(qr)
         val urlString = url.toString()
-        val id: String = urlString.substring(urlString.lastIndexOf("-")+1)
+        val id: String = urlString.substring(urlString.lastIndexOf("-") + 1)
         return QrCode(
             hash = id,
-            gray = generator.gray,
+            url = url.toString(),
+            image = getByteArray(url),
         )
+    }
+
+    private fun getByteArray(url: URI): ByteArray {
+        // Create the QrCode data structure with the url.
+        val qr = QrCodeEncoder().addAutomatic(url.toString()).fixate()
+        // Render the QR Code into a BoofCV style image
+        // 15 = pixelsPerModule (square)
+        val generator = QrCodeGeneratorImage(15).render(qr)
+        val output = ByteArrayOutputStream()
+        ImageIO.write(generator.gray?.asBufferedImage(), "png", output)
+        return output.toByteArray()
     }
 }

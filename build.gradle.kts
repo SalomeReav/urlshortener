@@ -29,11 +29,11 @@ subprojects {
     dependencies {
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
         arrayOf("core","swing","kotlin","WebcamCapture").forEach()
-         { "implementation"("org.boofcv:boofcv-$it:0.39.1") }
+        { "implementation"("org.boofcv:boofcv-$it:0.39.1") }
     }
 }
 
-project(":core") { 
+project(":core") {
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")

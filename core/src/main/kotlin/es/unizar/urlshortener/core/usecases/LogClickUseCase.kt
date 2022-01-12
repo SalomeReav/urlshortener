@@ -4,7 +4,6 @@ import es.unizar.urlshortener.core.Click
 import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.ClickRepositoryService
 import java.time.OffsetDateTime
-import java.util.Date
 
 /**
  * Log that somebody has requested the redirection identified by a key.

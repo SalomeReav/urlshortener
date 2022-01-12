@@ -2,8 +2,6 @@ package es.unizar.urlshortener.core
 
 import java.time.OffsetDateTime
 import java.util.*
-import boofcv.struct.image.GrayU8
-import javax.print.attribute.IntegerSyntax
 
 /**
  * A [Click] captures a request of redirection of a [ShortUrl] identified by its [hash].
@@ -27,11 +25,12 @@ data class ShortUrl(
 )
 
 /**
- * A [QRUrl] contains a qrcode image [gray] identified by [hash].
+ * A [QRUrl] contains a qrcode image [image] identified by [hash].
  */
 data class QrCode(
     val hash: String,
-    val gray: GrayU8? = null,
+    var image: ByteArray? = null,
+    val url: String,
 )
 
 /**
