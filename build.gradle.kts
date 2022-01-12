@@ -28,18 +28,18 @@ subprojects {
     }
     dependencies {
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-        arrayOf("core","swing","kotlin","WebcamCapture").forEach()
-         { "implementation"("org.boofcv:boofcv-$it:0.39.1") }
+        arrayOf("core", "swing", "kotlin", "WebcamCapture").forEach()
+        { "implementation"("org.boofcv:boofcv-$it:0.39.1") }
     }
 }
 
-project(":core") { 
+project(":core") {
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
     dependencies {
         "implementation"("io.ktor:ktor-client-core:1.6.5")
-        "implementation" ("io.ktor:ktor-client-cio:1.6.5")
+        "implementation"("io.ktor:ktor-client-cio:1.6.5")
         "implementation"("org.springframework.boot:spring-boot-starter")
     }
     tasks.getByName<BootJar>("bootJar") {
@@ -72,7 +72,7 @@ project(":delivery") {
         "implementation"("commons-validator:commons-validator:1.6")
         "implementation"("com.google.guava:guava:23.0")
         "implementation"("io.ktor:ktor-client-core:1.6.5")
-        "implementation" ("io.ktor:ktor-client-cio:1.6.5")
+        "implementation"("io.ktor:ktor-client-cio:1.6.5")
 
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.mockito.kotlin:mockito-kotlin:3.2.0")
@@ -91,7 +91,7 @@ project(":app") {
         "implementation"(project(":delivery"))
         "implementation"(project(":repositories"))
         "implementation"("org.springframework.boot:spring-boot-starter")
-        "implementation"( "org.webjars:bootstrap:3.3.5")
+        "implementation"("org.webjars:bootstrap:3.3.5")
         "implementation"("org.webjars:jquery:2.1.4")
 
         "runtimeOnly"("org.hsqldb:hsqldb")

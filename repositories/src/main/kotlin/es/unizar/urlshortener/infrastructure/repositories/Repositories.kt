@@ -1,7 +1,6 @@
 package es.unizar.urlshortener.infrastructure.repositories
 
 import org.springframework.data.jpa.repository.JpaRepository
-import java.time.OffsetDateTime
 
 /**
  * Specification of the repository of [ShortUrlEntity].
@@ -18,7 +17,7 @@ interface ShortUrlEntityRepository : JpaRepository<ShortUrlEntity, String> {
  * **Note**: Spring Boot is able to discover this [JpaRepository] without further configuration.
  */
 interface ClickEntityRepository : JpaRepository<ClickEntity, Long> {
-    fun findByHash(hash:String) : List<ClickEntity>
+    fun findByHash(hash: String): List<ClickEntity>
     fun countByHash(hash: String): Int
 }
 

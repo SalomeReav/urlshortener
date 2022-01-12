@@ -2,22 +2,18 @@ package es.unizar.urlshortener.infrastructure.delivery
 
 import com.google.common.hash.Hashing
 import es.unizar.urlshortener.core.HashService
-import org.springframework.scheduling.annotation.Async
-import java.util.concurrent.CompletableFuture
 import es.unizar.urlshortener.core.ValidatorService
-import org.apache.commons.validator.routines.UrlValidator
-import java.nio.charset.StandardCharsets
-import es.unizar.urlshortener.core.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.*
-import java.net.URL
-import java.net.URLEncoder
-import java.net.HttpURLConnection
+import kotlinx.coroutines.runBlocking
+import org.apache.commons.validator.routines.UrlValidator
+import org.springframework.scheduling.annotation.Async
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.CompletableFuture
 
 private const val CONNECTION_TIMEOUT = 3000L
 
@@ -31,14 +27,18 @@ open class ValidatorServiceImpl : ValidatorService {
             requestTimeoutMillis = CONNECTION_TIMEOUT
         }
     }
+
     @Async("taskExecutorReachable")
-    open override fun isReachable(url : String) : CompletableFuture<Boolean> {
+    open override fun isReachable(url: String): CompletableFuture<Boolean> {
         val response: HttpResponse?
         runBlocking {
-            response = try { client.get(url) }
-            catch (e: Exception) { null }
+            response = try {
+                client.get(url)
+            } catch (e: Exception) {
+                null
+            }
         }
-        
+
         return CompletableFuture.completedFuture(response?.status == HttpStatusCode.OK)
     }
 
