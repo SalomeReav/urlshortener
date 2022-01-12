@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
  *  Returns the clicks number for the current day from a url identified by it [id]
  */
 interface GetClicksDayUseCase {
-    fun getClicksDay(hash: String) : Map<String, Int>
+    fun getClicksDay(hash: String, remoteUsr: String) : Map<String, Int>
 }
 
 /**
@@ -17,7 +17,9 @@ interface GetClicksDayUseCase {
 class GetClicksDayUseCaseImpl (
     private val clickRepository: ClickRepositoryService
 ) : GetClicksDayUseCase {
-    override fun getClicksDay(hash: String): Map<String, Int> {
+    override fun getClicksDay(hash: String, remoteUsr: String): Map<String, Int> {
+        var lastRemoteUser = clickRepository.findByHash(hash).last() //Get the lastRemoteUser who did a click
+        if (remoteUsr == lastRemoteUser.properties.lastRemoteUser) return mutableMapOf<String,Int>(); //Avoid that user generate statistics on my url on each consecutive click.
         var list = clickRepository
             .findByHash(hash)
         if (list.isEmpty()) return mutableMapOf<String,Int>();

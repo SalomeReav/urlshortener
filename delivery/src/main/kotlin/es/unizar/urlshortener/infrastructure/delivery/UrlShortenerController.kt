@@ -120,9 +120,9 @@ class UrlShortenerControllerImpl(
     override fun getClicksInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClicksDataOut> =
         redirectUseCase.redirectTo(id).let {
             val data = ClicksDataOut(
-                clicks = getClicksNumberUseCase.getClicksNumber(id),
-                users = getUsersCountUseCase.getUsersCount(id),
-                clicksByDay = getClicksDayUseCase.getClicksDay(id)
+                clicks = getClicksNumberUseCase.getClicksNumber(id, request.remoteUser),
+                users = getUsersCountUseCase.getUsersCount(id, request.remoteUser),
+                clicksByDay = getClicksDayUseCase.getClicksDay(id, request.remoteUser)
             )
             return ResponseEntity<ClicksDataOut>(data, HttpStatus.OK)
         }

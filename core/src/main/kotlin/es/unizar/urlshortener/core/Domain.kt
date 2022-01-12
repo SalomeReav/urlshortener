@@ -64,6 +64,7 @@ data class ClickProperties(
     val referrer: String? = null,
     val browser: String? = null,
     val platform: String? = null,
+    val lastRemoteUser: String? = null,
     val country: String? = null,
 )
 
