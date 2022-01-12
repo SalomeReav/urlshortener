@@ -137,9 +137,9 @@ class UrlShortenerControllerTest {
 
     @Test
     fun `clicksInfo returns a json with clicks, users and clicksByDay when the key exists`() {
-        given(getClicksNumberUseCase.getClicksNumber("key")).willReturn(0)
-        given(getUsersCountUseCase.getUsersCount("key")).willReturn(0)
-        given(getClicksDayUseCase.getClicksDay("key")).willReturn(mutableMapOf<String,Int>())
+        given(getClicksNumberUseCase.getClicksNumber("key", "user")).willReturn(0)
+        given(getUsersCountUseCase.getUsersCount("key", "user")).willReturn(0)
+        given(getClicksDayUseCase.getClicksDay("key", "user")).willReturn(mutableMapOf<String,Int>())
         mockMvc.perform(get("/{id}.json", "key"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.clicks").value(0))
