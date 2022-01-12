@@ -1,6 +1,7 @@
 package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.QrCode
+import es.unizar.urlshortener.core.QrCodeNotCreated
 import es.unizar.urlshortener.core.QrCodeNotFound
 import es.unizar.urlshortener.core.QrCodeRepositoryService
 
@@ -15,10 +16,14 @@ interface GetQrImageUseCase {
  * Implementation of [GetQrImageUseCase].
  */
 class GetQrImageUseCaseImpl(
-    private val qrCodeRepository: QrCodeRepositoryService
+    private val qrCodeRepository: QrCodeRepositoryService,
 ) : GetQrImageUseCase {
-    override fun getQrImage(key: String) = qrCodeRepository
-        .findByKey(key)
-        ?: throw QrCodeNotFound(key)
+    override fun getQrImage(key: String): QrCode {
+        var qrCode = qrCodeRepository
+            .findByKey(key) ?: throw QrCodeNotFound(key)
+        if (qrCode.image == null)
+            throw QrCodeNotCreated(qrCode.url)
+        return qrCode
+    }
 }
 

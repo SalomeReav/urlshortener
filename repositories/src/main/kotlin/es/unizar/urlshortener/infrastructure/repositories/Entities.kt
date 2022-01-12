@@ -1,9 +1,7 @@
 package es.unizar.urlshortener.infrastructure.repositories
 
 import java.time.OffsetDateTime
-import java.util.*
 import javax.persistence.*
-import boofcv.struct.image.GrayU8
 
 /**
  * The [ClickEntity] entity logs clicks.
@@ -53,6 +51,7 @@ class ShortUrlEntity(
 class QrCodeEntity(
     @Id
     val hash: String,
-    @Column(name = "gray", length = Integer.MAX_VALUE)
-    val gray: GrayU8?
+    val url: String,
+    @Column(name = "image", length = Integer.MAX_VALUE)
+    var image: ByteArray?
 )

@@ -38,7 +38,8 @@ fun ShortUrlEntity.toDomain() = ShortUrl(
     hash = hash,
     redirection = Redirection(
         target = target,
-        mode = mode),
+        mode = mode
+    ),
     created = created,
     lastRedirect = lastRedirect,
     redirectCount = redirectCount,
@@ -77,7 +78,8 @@ fun ShortUrl.toEntity() = ShortUrlEntity(
  */
 fun QrCodeEntity.toDomain() = QrCode(
     hash = hash,
-    gray = gray
+    image = image,
+    url = url,
 )
 
 /**
@@ -85,5 +87,6 @@ fun QrCodeEntity.toDomain() = QrCode(
  */
 fun QrCode.toEntity() = QrCodeEntity(
     hash = hash,
-    gray = gray
+    url = url,
+    image = image
 )

@@ -2,9 +2,6 @@ package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.*
 
-import java.util.Date
-import java.util.concurrent.CompletableFuture
-
 /**
  * Given an url returns the key that is used to create a short URL.
  * When the url is created optional data may be added.
@@ -17,7 +14,7 @@ interface CreateShortUrlUseCase {
 
 /**
  * Implementation of [CreateShortUrlUseCase].
- */  
+ */
 class CreateShortUrlUseCaseImpl(
     private val shortUrlRepository: ShortUrlRepositoryService,
     private val validatorService: ValidatorService,

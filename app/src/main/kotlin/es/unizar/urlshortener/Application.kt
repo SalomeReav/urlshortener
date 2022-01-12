@@ -7,6 +7,7 @@ import org.springframework.boot.runApplication
  * The marker that makes this project a Spring Boot application.
  */
 @SpringBootApplication
+
 class UrlShortenerApplication
 
 /**
