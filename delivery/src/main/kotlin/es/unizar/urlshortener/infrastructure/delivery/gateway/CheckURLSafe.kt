@@ -2,10 +2,17 @@ package es.unizar.urlshortener.infrastructure.delivery.gateway;
 import es.unizar.urlshortener.core.CheckURLSafeService
 import java.net.HttpURLConnection
 import java.net.URL
+import es.unizar.urlshortener.core.*
+import java.util.concurrent.CompletableFuture
+import kotlinx.coroutines.runBlocking
+import org.springframework.scheduling.annotation.Async
+
+
 class CheckURLSafeServiceImpl(
 
 ): CheckURLSafeService {
-    override fun checkUrlSafe(url: String): Boolean {
+    @Async("taskExecutorSafe")
+    override fun checkUrlSafe(url: String): CompletableFuture<Boolean> {
         
         val apiUrl =
             "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyDd8lcmHyHjn6hi3DoFgNVn2Exs4nk1oYM"
@@ -26,27 +33,32 @@ class CheckURLSafeServiceImpl(
             }
         }""".trimIndent()
 
-        val connection = URL(apiUrl).openConnection() as HttpURLConnection
-        with(connection) {
-            requestMethod = "POST"
-            doOutput = data != null
-            headers?.forEach(this::setRequestProperty)
-        }
-
-        if (data != null) {
-            connection.outputStream.use {
-                it.write(data.toByteArray())
+        runBlocking {
+            val connection = URL(apiUrl).openConnection() as HttpURLConnection
+            with(connection) {
+                requestMethod = "POST"
+                doOutput = (data != "{}")
+                headers?.forEach(this::setRequestProperty)
             }
+
+            if (data != null) {
+                connection.outputStream.use {
+                    it.write(data.toByteArray())
+                }
+            }
+            val responseBody = connection.inputStream.use { it.readBytes() }.toString(Charsets.UTF_8)
         }
-        val responseBody = connection.inputStream.use { it.readBytes() }.toString(Charsets.UTF_8)
         println("-----------"+responseBody)
-        return true;
 
-
-        /*if( JSON.stringify(respuesta) != '{}'){
-        throw InvalidUrlException(url)
-    }
-    return (200 == response.statusCode())*/
+        return CompletableFuture.completedFuture(
+            if( responseBody != "{}"){
+                throw InvalidUrlException(url)
+            }
+            else{
+                return true;
+            }
+        )
+       
 
     }
 }

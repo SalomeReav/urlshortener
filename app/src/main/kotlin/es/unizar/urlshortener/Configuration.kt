@@ -18,18 +18,34 @@ import es.unizar.urlshortener.infrastructure.repositories.QrCodeRepositoryServic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.util.concurrent.Executor
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
  *
  * **Note**: Spring Boot is able to discover this [Configuration] without further configuration.
  */
+
+@EnableAsync(proxyTargetClass = true) 
 @Configuration
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
     @Autowired val clickEntityRepository: ClickEntityRepository,
     @Autowired val qrCodeEntityRepository: QrCodeEntityRepository,
 ) {
+
+    @Bean(name = ["taskExecutorSafe"])
+    fun taskExecutor(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
+        executor.initialize()
+        return executor
+    }
+
     @Bean
     fun clickRepositoryService() = ClickRepositoryServiceImpl(clickEntityRepository)
 
@@ -58,7 +74,7 @@ class ApplicationConfiguration(
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
     @Bean
-    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), checkReachableService(), checkURLSafeService())
+    fun createShortUrlUseCase() = CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService(), checkURLSafeService())
     
     @Bean
     fun createQrCodeUseCase() = CreateQrCodeUseCaseImpl(qrCodeRepositoryService(), hashService())
