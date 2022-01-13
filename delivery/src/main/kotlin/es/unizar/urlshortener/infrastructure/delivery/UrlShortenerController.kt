@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.bind.annotation.*
 import java.net.URI
+import java.time.OffsetDateTime
 import java.util.concurrent.*
 import javax.servlet.http.HttpServletRequest
 import kotlin.concurrent.thread
@@ -94,7 +95,8 @@ class UrlShortenerControllerImpl(
     val limitRedirectUseCase: LimitRedirectUseCase,
     private val validatorService: ValidatorService,
     val qrQueue: BlockingQueue<String>,
-) : UrlShortenerController {
+    val limitQueue: BlockingQueue<TimeOfRedirection>,
+    ) : UrlShortenerController {
 
     @Autowired
     @Async("taskExecutorQrCode")
@@ -105,10 +107,21 @@ class UrlShortenerControllerImpl(
             }
     }
 
+    @Autowired
+    @Async("taskExecutorLimit")
+    fun startLimitConsumers() {
+        for (i in 0..3)
+            thread {
+                LimitConsumer(limitQueue, limitRedirectUseCase).run()
+            }
+    }
+
+
     @GetMapping("/tiny-{id:.*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =
         limitRedirectUseCase.limitRedirectByDay(id).let {
             if (it) {
+                limitQueue.put(TimeOfRedirection(id, OffsetDateTime.now()))
                 redirectUseCase.redirectTo(id).let {
                     logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
                     val h = HttpHeaders()

@@ -66,6 +66,8 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var qrQueue: BlockingQueue<String>
 
+    @MockBean
+    private lateinit var limitQueue: BlockingQueue<TimeOfRedirection>
 
     @Test
     fun `redirectTo returns a redirect when the key exists`() {

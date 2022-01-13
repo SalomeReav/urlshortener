@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter
  */
 interface LimitRedirectUseCase {
     fun limitRedirectByDay(hash: String): Boolean
+    fun updateLastRedirect(hash: String, now: OffsetDateTime)
 }
 
 /**
@@ -20,19 +21,24 @@ class LimitRedirectUseCaseImpl(
     var LIMIT_BY_DAY = 10;
     override fun limitRedirectByDay(hash: String): Boolean {
         var available = false
-        val dateFormat = DateTimeFormatter.ISO_LOCAL_DATE
         val shortUrl = shortUrlRepositoryService.findByKey(hash)
         if (shortUrl != null && shortUrl.redirectCount!! < LIMIT_BY_DAY) {
-            val now = OffsetDateTime.now()
+            available = true
+        }
+        return available
+    }
+
+    override fun updateLastRedirect(hash: String, now: OffsetDateTime){
+        val shortUrl = shortUrlRepositoryService.findByKey(hash)
+        val dateFormat = DateTimeFormatter.ISO_LOCAL_DATE
+        if(shortUrl!=null) {
             if (shortUrl.lastRedirect?.format(dateFormat).equals(now.format(dateFormat))) {
                 shortUrl.redirectCount = shortUrl.redirectCount?.plus(1)
             } else
                 shortUrl.redirectCount = 0
             shortUrl.lastRedirect = now
             shortUrlRepositoryService.save(shortUrl)
-            available = true
-            println("------" + shortUrl.redirectCount + "-----" + shortUrl.lastRedirect)
         }
-        return available
     }
+
 }

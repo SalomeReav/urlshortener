@@ -25,12 +25,21 @@ data class ShortUrl(
 )
 
 /**
- * A [QRUrl] contains a qrcode image [image] identified by [hash].
+ * A [QRCode] contains a qrcode image [image] identified by [hash].
  */
 data class QrCode(
     val hash: String,
     var image: ByteArray? = null,
     val url: String,
+)
+
+/**
+ * A [TimeOfRedirection] contains the moment [last] of the last redirection
+ * identified by [hash] .
+ */
+data class TimeOfRedirection(
+    val hash: String,
+    val last: OffsetDateTime,
 )
 
 /**

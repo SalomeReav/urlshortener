@@ -1,6 +1,8 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
+import es.unizar.urlshortener.core.TimeOfRedirection
 import es.unizar.urlshortener.core.usecases.CreateQrCodeUseCase
+import es.unizar.urlshortener.core.usecases.LimitRedirectUseCase
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -20,20 +22,12 @@ class QRConsumer(private val queue: BlockingQueue<String>, private val qrService
     }
 }
 
-class LogConsumer(private val queue: BlockingQueue<String>, private val qrService: CreateQrCodeUseCase) : Runnable {
+class LimitConsumer(private val queue: BlockingQueue<TimeOfRedirection>, private val limitService: LimitRedirectUseCase) : Runnable {
     override fun run() {
         try {
-            runBlocking {
-                while (true) {
-                    coroutineScope {  // this: CoroutineScope
-                        val url = queue.take()
-                        launch() {
-                            println("Start " + url)
-                            Thread.sleep(2500)
-                            qrService.createQRImage(URI(url))
-                        }
-                    }
-                }
+            while (true) {
+                var redirection = queue.take()
+                limitService.updateLastRedirect(redirection.hash,redirection.last)
             }
         } catch (e: InterruptedException) {
             Thread.currentThread().interrupt()

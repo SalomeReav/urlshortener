@@ -1,5 +1,6 @@
 package es.unizar.urlshortener
 
+import es.unizar.urlshortener.core.TimeOfRedirection
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
@@ -61,6 +62,20 @@ class ApplicationConfiguration(
         return executor
     }
 
+    @Bean(name = ["taskExecutorLimit"])
+    fun limitExecutor(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
+        executor.initialize()
+        return executor
+    }
+    @Bean
+    fun qrQueue(): BlockingQueue<String>? {
+        return ArrayBlockingQueue<String>(10)
+    }
+
     @Bean(name = ["taskExecutorSafe"])
     fun taskExecutorSafe(): Executor? {
         val executor = ThreadPoolTaskExecutor()
@@ -72,8 +87,8 @@ class ApplicationConfiguration(
     }
 
     @Bean
-    fun qrQueue(): BlockingQueue<String>? {
-        return ArrayBlockingQueue<String>(10)
+    fun limitQueue(): BlockingQueue<TimeOfRedirection>? {
+        return ArrayBlockingQueue<TimeOfRedirection>(10)
     }
 
     @Bean

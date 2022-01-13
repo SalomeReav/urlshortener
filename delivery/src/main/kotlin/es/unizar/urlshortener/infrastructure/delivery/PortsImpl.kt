@@ -4,6 +4,7 @@ import com.google.common.hash.Hashing
 import es.unizar.urlshortener.core.HashService
 import es.unizar.urlshortener.core.ValidatorService
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
@@ -40,17 +41,13 @@ open class ValidatorServiceImpl : ValidatorService {
                 null
             }
         }
-
         return CompletableFuture.completedFuture(response?.status == HttpStatusCode.OK)
     }
 
     @Async("taskExecutorSafe")
     open override fun checkUrlSafe(url : String) : CompletableFuture<Boolean> {
-         val apiUrl =
+        val apiUrl =
             "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyDd8lcmHyHjn6hi3DoFgNVn2Exs4nk1oYM"
-        val headers = mapOf(
-            "Content-Type" to "application/json"
-        )
         val data = """
             { "client": 
                 {
@@ -58,35 +55,28 @@ open class ValidatorServiceImpl : ValidatorService {
                     "clientVersion": "1.5.2"
                 },
             "threatInfo": {
-                "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING"],
-                "platformTypes": ["WINDOWS"],
+				"threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "THREAT_TYPE_UNSPECIFIED",
+                                "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION"],
+				"platformTypes": ["WINDOWS"],
                 "threatEntryTypes": ["URL"],
                 "threatEntries": [{"url": "$url"},]
             }
         }""".trimIndent()
-
-        var responseBody = "{}"
+        val responseBody: String
         runBlocking {
-            val connection = URL(apiUrl).openConnection() as HttpURLConnection
-            with(connection) {
-                requestMethod = "POST"
-                doOutput = (data != "{}")
-                headers?.forEach(this::setRequestProperty)
-            }
-
-            if (data != null) {
-                connection.outputStream.use {
-                    it.write(data.toByteArray())
+            val httpResponse: HttpResponse = client.post(apiUrl) {
+                contentType(ContentType.Application.Json)
+                body = data
+                headers{
+                    append(HttpHeaders.Accept, "text/html")
                 }
             }
-            responseBody = connection.inputStream.use { it.readBytes() }.toString(Charsets.UTF_8)
-            println("RESPONSE--"+responseBody)
+            println("STATUS"+httpResponse.toString())
+            responseBody = httpResponse.receive()
         }
-
-        return CompletableFuture.completedFuture(responseBody == "{}")
+        println("RESPONSE2"+"$url"+"--"+responseBody+"-|||-"+(responseBody=="{}\n"))
+        return CompletableFuture.completedFuture(responseBody == "{}\n")
     }
-
-
     companion object {
         val urlValidator = UrlValidator(arrayOf("http", "https"))
     }
