@@ -35,7 +35,7 @@ interface QrCodeRepositoryService {
 interface ValidatorService {
     fun isValid(url: String): Boolean
     fun isReachable(url: String): CompletableFuture<Boolean>
-    fun checkUrlSafe(url: String): CompletableFuture<Boolean>
+    fun isSafe(url: String): CompletableFuture<Boolean>
 }
 
 /**

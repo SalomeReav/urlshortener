@@ -36,7 +36,7 @@ data class QrCode(
 )
 
 /**
- * A [TimeOfRedirection] contains the moment [last] of the last redirection
+ * A [TimeOfRedirection] contains the time [last] of the last redirection
  * identified by [hash] .
  */
 data class TimeOfRedirection(
@@ -80,7 +80,7 @@ data class ClickProperties(
 )
 
 /**
- * A [ClicksInfo] is the bag of stats of [Click]s that a [ShortUrl] may have.
+ * A [ClicksInfo] is the bag of stats of [Click] that a [ShortUrl] may have.
  */
 data class ClicksInfo(
     var totalClicks: Int = 0,

@@ -30,7 +30,7 @@ open class ValidatorServiceImpl : ValidatorService {
     }
 
     @Async("taskExecutorReachable")
-    open override fun isReachable(url: String): CompletableFuture<Boolean> {
+    override fun isReachable(url: String): CompletableFuture<Boolean> {
         val response: HttpResponse?
         runBlocking {
             response = try {
@@ -43,7 +43,7 @@ open class ValidatorServiceImpl : ValidatorService {
     }
 
     @Async("taskExecutorSafe")
-    open override fun checkUrlSafe(url: String): CompletableFuture<Boolean> {
+    override fun isSafe(url: String): CompletableFuture<Boolean> {
         val apiUrl =
             "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyDd8lcmHyHjn6hi3DoFgNVn2Exs4nk1oYM"
         val data = """
@@ -69,11 +69,8 @@ open class ValidatorServiceImpl : ValidatorService {
                     append(HttpHeaders.Accept, "text/html")
                 }
             }
-            println("STATUS" + httpResponse.toString())
             responseBody = httpResponse.receive()
-            println("RESPONSE1" + "$url" + "--" + responseBody + "-|||-" + (responseBody == "{}\n"))
         }
-        println("RESPONSE2" + "$url" + "--" + responseBody + "-|||-" + (responseBody == "{}\n"))
         return CompletableFuture.completedFuture(responseBody == "{}\n")
     }
 

@@ -5,7 +5,8 @@ import java.time.format.DateTimeFormatter
 
 
 /**
- *  Returns the users count who pressed on a url identified by it [id]
+ *  getInfo: Returns statistics of a shortUrl identified by it [hash]
+ *  updateInfo: Update statistics of a shortUrl identified by it [hash]
  */
 interface GetClicksInfoUseCase {
     fun getInfo(hash: String): ClicksInfo
@@ -25,7 +26,6 @@ class GetClicksInfoUseCaseImpl(
     }
 
     override fun updateInfo(hash: String) {
-        println("UPDATE " + hash + "  ")
         var shortUrl: ShortUrl? = shortUrlRepository.findByKey(hash) ?: throw RedirectionNotFound(hash)
         if (shortUrl != null) {
             var list = clickRepository.findByHash(hash)

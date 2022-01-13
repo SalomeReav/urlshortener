@@ -25,7 +25,6 @@ class ShortUrlRepositoryServiceImpl(
     private val shortUrlEntityRepository: ShortUrlEntityRepository
 ) : ShortUrlRepositoryService {
     override fun findByKey(id: String): ShortUrl? = shortUrlEntityRepository.findByHash(id)?.toDomain()
-
     override fun save(su: ShortUrl): ShortUrl = shortUrlEntityRepository.save(su.toEntity()).toDomain()
 }
 
@@ -36,6 +35,5 @@ class QrCodeRepositoryServiceImpl(
     private val qrCodeEntityRepository: QrCodeEntityRepository
 ) : QrCodeRepositoryService {
     override fun findByKey(id: String): QrCode? = qrCodeEntityRepository.findByHash(id)?.toDomain()
-
     override fun save(qc: QrCode): QrCode = qrCodeEntityRepository.save(qc.toEntity()).toDomain()
 }

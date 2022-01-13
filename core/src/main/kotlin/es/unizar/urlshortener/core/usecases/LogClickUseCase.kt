@@ -2,12 +2,9 @@ package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.*
 import java.time.OffsetDateTime
-import java.util.concurrent.Future
 
 /**
  * Log that somebody has requested the redirection identified by a key.
- *
- * **Note**: This is an example of functionality.
  */
 interface LogClickUseCase {
     fun logClick(key: String, data: ClickProperties)
@@ -33,21 +30,18 @@ class LogClickUseCaseImpl(
         clickRepository.save(cl)
     }
 
+    // Check if it is time to update the click statistics
     private fun checkData(key: String) {
-        println("SLEEPING")
-        Thread.sleep(1000)
         var shortUrl: ShortUrl? = shortUrlRepository.findByKey(key) ?: throw RedirectionNotFound(key)
         if (shortUrl != null) {
             val now = OffsetDateTime.now()
-            val hourBefore = now.plusSeconds(-10)
-            println("HOURS-" + hourBefore + "||" + shortUrl.lastInfo)
-            if (shortUrl.lastInfo?.isBefore(hourBefore) == true) {
+            val tenSecBefore = now.plusSeconds(-10)
+            if (shortUrl.lastInfo?.isBefore(tenSecBefore) == true) {
                 getUsersCountUseCase.updateInfo(key)
                 shortUrl = shortUrlRepository.findByKey(key) ?: throw RedirectionNotFound(key)
                 shortUrl.lastInfo = now
                 shortUrlRepository.save(shortUrl)
             }
         }
-        println("FINISH")
     }
 }

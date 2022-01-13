@@ -108,6 +108,10 @@ For further reference, please consider the following sections:
 * [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.5.5/gradle-plugin/reference/html/)
 * [Spring Web](https://docs.spring.io/spring-boot/docs/2.5.5/reference/htmlsingle/#boot-features-developing-web-applications)
 * [Spring Data JPA](https://docs.spring.io/spring-boot/docs/2.5.5/reference/htmlsingle/#boot-features-jpa-and-spring-data)
+* [QrCodeEncoder] (http://boofcv.org/javadoc/boofcv/alg/fiducial/qrcode/QrCodeEncoder.html)
+* [Google Safe Browsing] (https://developers.google.com/safe-browsing)
+* [Task Execution and Scheduling] (https://docs.spring.io/spring-framework/docs/4.2.x/spring-framework-reference/html/scheduling.html)
+* [Ktor] (https://ktor.io/)
 
 ## Guides
 
@@ -117,4 +121,5 @@ The following guides illustrate how to use some features concretely:
 * [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
 * [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
 * [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-
+* [Google Safe Browsing Lookup API (v4) ] (https://developers.google.com/safe-browsing/v4/lookup-api)
+* [Getting started with a Ktor Client] (https://ktor.io/docs/getting-started-ktor-client.html)

@@ -2,7 +2,6 @@
 
 import es.unizar.urlshortener.core.*
 import es.unizar.urlshortener.core.usecases.*
-import kotlinx.coroutines.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -10,10 +9,13 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Async
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 import java.time.OffsetDateTime
-import java.util.concurrent.*
+import java.util.concurrent.BlockingQueue
 import javax.servlet.http.HttpServletRequest
 import kotlin.concurrent.thread
 
@@ -48,7 +50,7 @@ interface UrlShortenerController {
      * Returns the clicks number, clicks number filtered by date and the users count who
      * pressed on a url identified by it [id]
      *
-     * **Note**: Delivery of use cases [GetClicksNumbersUseCase] [GetClicksDayUseCase] [GetClicksInfoUseCase].
+     * **Note**: Delivery of use cases [GetClicksInfoUseCase].
      */
     fun getClicksInfo(id: String, request: HttpServletRequest): ResponseEntity<ClicksInfo>
 }
@@ -70,7 +72,6 @@ data class ShortUrlDataOut(
     var qr: URI? = null,
     val properties: Map<String, Any> = emptyMap()
 )
-
 
 /**
  * The implementation of the controller.
@@ -107,7 +108,6 @@ class UrlShortenerControllerImpl(
                 LimitConsumer(limitQueue, limitRedirectUseCase).run()
             }
     }
-
 
     @GetMapping("/tiny-{id:.*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Void> =

@@ -106,8 +106,8 @@ class HttpRequestTest {
     @Test
     fun `redirectTo returns a not found when the key does not exist`() {
         val response = restTemplate.getForEntity("http://localhost:$port/f684a3c4", String::class.java)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
 
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
     }
 
@@ -140,7 +140,6 @@ class HttpRequestTest {
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(0)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "click")).isEqualTo(0)
     }
@@ -160,7 +159,10 @@ class HttpRequestTest {
     fun `getQrImage returns a image when the key exists`() {
         val target = shortUrl("http://www.unizar.es/", true).body?.qr
         require(target != null)
-
+        Thread.sleep(3_000)
+        val response = restTemplate.getForEntity(target, ByteArray::class.java)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.headers.contentType).isEqualTo(MediaType.IMAGE_PNG)
     }
 
     @Test

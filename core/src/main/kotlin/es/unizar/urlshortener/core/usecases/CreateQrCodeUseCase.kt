@@ -9,11 +9,10 @@ import java.io.ByteArrayOutputStream
 import java.net.URI
 import javax.imageio.ImageIO
 
-/**
- * Given an url returns the key that is used to create a Qr Code url.
- */
 interface CreateQrCodeUseCase {
+    //Given an url returns the key that is used to create a Qr Code url.
     fun create(url: URI): QrCode
+    //Given an url returns the qrCode image that represents the url
     fun createQRImage(url: URI): QrCode
 }
 

@@ -5,7 +5,10 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 /**
- *  Returns the clicks number for the current day from a url identified by it [id]
+ *  limitRedirectByDay:
+ *      Return if it is possible to do the redirection to a url identified by it [id]
+ *  updateLastRedirect:
+ *      Update the time of the last redirection to a url identified by it [id]
  */
 interface LimitRedirectUseCase {
     fun limitRedirectByDay(hash: String): Boolean
@@ -13,18 +16,17 @@ interface LimitRedirectUseCase {
 }
 
 /**
- * Implementation of [GetClicksDayUseCase].
+ * Implementation of [LimitRedirectUseCase].
  */
 class LimitRedirectUseCaseImpl(
     private val shortUrlRepositoryService: ShortUrlRepositoryService
 ) : LimitRedirectUseCase {
-    var LIMIT_BY_DAY = 10;
+    private var _limitByDay = 6;
     override fun limitRedirectByDay(hash: String): Boolean {
         var available = false
         val shortUrl = shortUrlRepositoryService.findByKey(hash)
-        if (shortUrl != null && shortUrl.redirectCount!! < LIMIT_BY_DAY) {
+        if (shortUrl != null && shortUrl.redirectCount!! < _limitByDay)
             available = true
-        }
         return available
     }
 
@@ -32,13 +34,12 @@ class LimitRedirectUseCaseImpl(
         val shortUrl = shortUrlRepositoryService.findByKey(hash)
         val dateFormat = DateTimeFormatter.ISO_LOCAL_DATE
         if (shortUrl != null) {
-            if (shortUrl.lastRedirect?.format(dateFormat).equals(now.format(dateFormat))) {
+            if (shortUrl.lastRedirect?.format(dateFormat).equals(now.format(dateFormat)))
                 shortUrl.redirectCount = shortUrl.redirectCount?.plus(1)
-            } else
+            else
                 shortUrl.redirectCount = 0
             shortUrl.lastRedirect = now
             shortUrlRepositoryService.save(shortUrl)
         }
     }
-
 }

@@ -23,7 +23,6 @@ class RedirectUseCaseImpl(
         val redirection: Redirection = su?.redirection
             ?: throw RedirectionNotFound(key)
         if (!su.properties.checked || !su.properties.checkedSafe) {
-            println(su.properties.toString())
             throw UrlNotChecked(redirection.target)
         } else if (su.properties.checkedSafe && !su.properties.safe) {
             throw UrlNotSafe(redirection.target)

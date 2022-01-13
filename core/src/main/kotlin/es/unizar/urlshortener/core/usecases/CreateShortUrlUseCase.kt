@@ -5,8 +5,6 @@ import es.unizar.urlshortener.core.*
 /**
  * Given an url returns the key that is used to create a short URL.
  * When the url is created optional data may be added.
- *
- * **Note**: This is an example of functionality.
  */
 interface CreateShortUrlUseCase {
     fun create(url: String, data: ShortUrlProperties): ShortUrl
@@ -26,7 +24,7 @@ class CreateShortUrlUseCaseImpl(
         }
         val id: String = hashService.hasUrl(url)
         val reachable = validatorService.isReachable(url)
-        val safe = validatorService.checkUrlSafe(url)
+        val safe = validatorService.isSafe(url)
         val su = ShortUrl(
             hash = id,
             redirection = Redirection(target = url),
@@ -58,7 +56,6 @@ class CreateShortUrlUseCaseImpl(
                     shortUrlSaved.properties.safe = safe.getNow(false)
                 }
                 shortUrlSaved.properties.checkedSafe = true
-                println("SAFE--" + shortUrlSaved.properties.toString())
                 shortUrlRepository.save(shortUrlSaved)
             }
         }

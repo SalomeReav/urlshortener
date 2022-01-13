@@ -94,6 +94,7 @@ class UrlShortenerControllerTest {
     @Test
     fun `redirectTo returns a service unavailable when the key exists but the limit has been reached`() {
         given(limitRedirectUseCase.limitRedirectByDay("key")).willReturn(false)
+
         mockMvc.perform(get("/tiny-{id}", "key"))
             .andExpect(status().isTooManyRequests)
             .andExpect(jsonPath("$.statusCode").value(429))
@@ -111,8 +112,7 @@ class UrlShortenerControllerTest {
         mockMvc.perform(
             post("/api/link")
                 .param("url", "http://example.com/")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        )
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
             .andDo(print())
             .andExpect(status().isCreated)
             .andExpect(redirectedUrl("http://localhost/tiny-f684a3c4"))
@@ -131,8 +131,7 @@ class UrlShortenerControllerTest {
         mockMvc.perform(
             post("/api/link")
                 .param("url", "ftp://example.com/")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        )
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.statusCode").value(400))
     }
@@ -149,12 +148,9 @@ class UrlShortenerControllerTest {
         mockMvc.perform(
             post("/api/link")
                 .param("url", "http://notreachableurl.com/")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        )
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
             .andExpect(status().isBadRequest)
-
     }
-
 
     @Test
     fun `clicksInfo returns a json with clicks, users and clicksByDay when the key exists`() {
@@ -184,8 +180,7 @@ class UrlShortenerControllerTest {
             post("/api/link")
                 .param("url", "http://www.unizar.es/")
                 .param("createQR", "true")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        )
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
             .andDo(print())
             .andExpect(status().isCreated)
             .andExpect(redirectedUrl("http://localhost/tiny-6bb9db44"))
@@ -215,8 +210,6 @@ class UrlShortenerControllerTest {
     }
 
     private fun qrCode(url: URI): QrCode {
-        val qr = QrCodeEncoder().addAutomatic(url.toString()).fixate()
-        val generator = QrCodeGeneratorImage(15).render(qr)
         val urlString = url.toString()
         val id: String = urlString.substring(urlString.lastIndexOf("-") + 1)
         return QrCode(

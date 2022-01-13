@@ -6,7 +6,7 @@ import es.unizar.urlshortener.core.QrCodeNotFound
 import es.unizar.urlshortener.core.QrCodeRepositoryService
 
 /**
- * Given a key returns a [QrCode] that contains a [GrayU8 Image]
+ * Given a key returns a [QrCode] that contains a [QrCode image][QrCode.image]
  */
 interface GetQrImageUseCase {
     fun getQrImage(key: String): QrCode
