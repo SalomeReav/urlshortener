@@ -18,7 +18,8 @@ class ClickEntity(
     val referrer: String?,
     val browser: String?,
     val platform: String?,
-    val country: String?
+    val country: String?,
+    val lastRemoteUser: String?,
 )
 
 /**
@@ -41,7 +42,15 @@ class ShortUrlEntity(
     val ip: String?,
     val country: String?,
     val redirectCount: Int?,
-    val lastRedirect: OffsetDateTime?
+    val lastRedirect: OffsetDateTime?,
+    val lastInfo: OffsetDateTime?,
+    val totalClicks: Int,
+    val usersCount: Int,
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "clicks_day")
+    @MapKeyColumn(name = "day")
+    @Column(name = "clicks")
+    val numClicksDay: Map<String, Int>
 )
 
 /**

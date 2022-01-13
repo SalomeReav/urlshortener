@@ -58,7 +58,7 @@ class CreateShortUrlUseCaseImpl(
                     shortUrlSaved.properties.safe = safe.getNow(false)
                 }
                 shortUrlSaved.properties.checkedSafe = true
-                println("SAFE--"+shortUrlSaved.properties.toString())
+                println("SAFE--" + shortUrlSaved.properties.toString())
                 shortUrlRepository.save(shortUrlSaved)
             }
         }

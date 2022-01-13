@@ -13,6 +13,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.Executor
+import java.util.concurrent.LinkedBlockingQueue
 
 
 /**
@@ -71,9 +72,10 @@ class ApplicationConfiguration(
         executor.initialize()
         return executor
     }
+
     @Bean
     fun qrQueue(): BlockingQueue<String>? {
-        return ArrayBlockingQueue<String>(10)
+        return LinkedBlockingQueue<String>(10)
     }
 
     @Bean(name = ["taskExecutorSafe"])
@@ -88,7 +90,17 @@ class ApplicationConfiguration(
 
     @Bean
     fun limitQueue(): BlockingQueue<TimeOfRedirection>? {
-        return ArrayBlockingQueue<TimeOfRedirection>(10)
+        return LinkedBlockingQueue<TimeOfRedirection>(10)
+    }
+
+    @Bean(name = ["taskExecutorClicks"])
+    fun clicksExecutor(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 4
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(150)
+        executor.initialize()
+        return executor
     }
 
     @Bean
@@ -110,7 +122,8 @@ class ApplicationConfiguration(
     fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
 
     @Bean
-    fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
+    fun logClickUseCase() =
+        LogClickUseCaseImpl(clickRepositoryService(), getClicksInfoUseCase(), shortUrlRepositoryService())
 
     @Bean
     fun createQrCodeUseCase() = CreateQrCodeUseCaseImpl(qrCodeRepositoryService())
@@ -119,13 +132,7 @@ class ApplicationConfiguration(
     fun getQrImageUseCase() = GetQrImageUseCaseImpl(qrCodeRepositoryService())
 
     @Bean
-    fun getClicksNumberUseCase() = GetClicksNumberUseCaseImpl(clickRepositoryService())
-
-    @Bean
-    fun getClicksDayUseCase() = GetClicksDayUseCaseImpl(clickRepositoryService())
-
-    @Bean
-    fun getUsersCountUseCase() = GetUsersCountUseCaseImpl(clickRepositoryService())
+    fun getClicksInfoUseCase() = GetClicksInfoUseCaseImpl(clickRepositoryService(), shortUrlRepositoryService())
 
     @Bean
     fun createShortUrlUseCase() =

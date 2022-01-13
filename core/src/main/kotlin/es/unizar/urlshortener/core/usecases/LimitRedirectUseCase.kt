@@ -28,10 +28,10 @@ class LimitRedirectUseCaseImpl(
         return available
     }
 
-    override fun updateLastRedirect(hash: String, now: OffsetDateTime){
+    override fun updateLastRedirect(hash: String, now: OffsetDateTime) {
         val shortUrl = shortUrlRepositoryService.findByKey(hash)
         val dateFormat = DateTimeFormatter.ISO_LOCAL_DATE
-        if(shortUrl!=null) {
+        if (shortUrl != null) {
             if (shortUrl.lastRedirect?.format(dateFormat).equals(now.format(dateFormat))) {
                 shortUrl.redirectCount = shortUrl.redirectCount?.plus(1)
             } else

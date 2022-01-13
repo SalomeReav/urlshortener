@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -31,6 +32,7 @@ import javax.imageio.ImageIO
         RestResponseEntityExceptionHandler::class,
         ValidatorServiceImpl::class]
 )
+
 class UrlShortenerControllerTest {
 
     @Autowired
@@ -52,13 +54,7 @@ class UrlShortenerControllerTest {
     private lateinit var getQrImageUseCase: GetQrImageUseCase
 
     @MockBean
-    private lateinit var getClicksNumberUseCase: GetClicksNumberUseCase
-
-    @MockBean
-    private lateinit var getClicksDayUseCase: GetClicksDayUseCase
-
-    @MockBean
-    private lateinit var getUsersCountUseCase: GetUsersCountUseCase
+    private lateinit var getclicksInfoUseCase: GetClicksInfoUseCase
 
     @MockBean
     private lateinit var limitRedirectUseCase: LimitRedirectUseCase
@@ -162,14 +158,12 @@ class UrlShortenerControllerTest {
 
     @Test
     fun `clicksInfo returns a json with clicks, users and clicksByDay when the key exists`() {
-        given(getClicksNumberUseCase.getClicksNumber("key", "user")).willReturn(0)
-        given(getUsersCountUseCase.getUsersCount("key", "user")).willReturn(0)
-        given(getClicksDayUseCase.getClicksDay("key", "user")).willReturn(mutableMapOf<String, Int>())
+        given(getclicksInfoUseCase.getInfo("key")).willReturn(ClicksInfo(0,0, emptyMap()))
         mockMvc.perform(get("/{id}.json", "key"))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.clicks").value(0))
-            .andExpect(jsonPath("$.users").value(0))
-            .andExpect(jsonPath("$.clicksByDay").value(""))
+            .andExpect(jsonPath("$.totalClicks").value(0))
+            .andExpect(jsonPath("$.usersCount").value(0))
+            .andExpect(jsonPath("$.numClicksDay").value(""))
     }
 
     @Test

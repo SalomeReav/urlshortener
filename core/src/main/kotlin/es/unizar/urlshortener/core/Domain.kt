@@ -21,7 +21,9 @@ data class ShortUrl(
     val created: OffsetDateTime = OffsetDateTime.now(),
     val properties: ShortUrlProperties = ShortUrlProperties(),
     var redirectCount: Int? = 0,
-    var lastRedirect: OffsetDateTime? = OffsetDateTime.now()
+    var lastRedirect: OffsetDateTime? = OffsetDateTime.now(),
+    var clicksInfo: ClicksInfo = ClicksInfo(),
+    var lastInfo: OffsetDateTime? = OffsetDateTime.now(),
 )
 
 /**
@@ -58,7 +60,7 @@ data class ShortUrlProperties(
     val ip: String? = null,
     val sponsor: String? = null,
     var safe: Boolean = true,
-    var checkedSafe:Boolean = false,
+    var checkedSafe: Boolean = false,
     var checked: Boolean = false,
     var reachable: Boolean = false,
     val owner: String? = null,
@@ -77,3 +79,11 @@ data class ClickProperties(
     val country: String? = null,
 )
 
+/**
+ * A [ClicksInfo] is the bag of stats of [Click]s that a [ShortUrl] may have.
+ */
+data class ClicksInfo(
+    var totalClicks: Int = 0,
+    var usersCount: Int = 0,
+    var numClicksDay: Map<String, Int> = emptyMap()
+)

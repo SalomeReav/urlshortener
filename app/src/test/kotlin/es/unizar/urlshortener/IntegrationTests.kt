@@ -77,8 +77,10 @@ class HttpRequestTest {
         val data: MultiValueMap<String, String> = LinkedMultiValueMap()
         data["url"] = "http://www.holaesfalso.es/"
 
-        val response = restTemplate.postForEntity("http://localhost:$port/api/link",
-            HttpEntity(data, h), ShortUrlDataOut::class.java)
+        val response = restTemplate.postForEntity(
+            "http://localhost:$port/api/link",
+            HttpEntity(data, h), ShortUrlDataOut::class.java
+        )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)
@@ -92,8 +94,10 @@ class HttpRequestTest {
         val data: MultiValueMap<String, String> = LinkedMultiValueMap()
         data["url"] = "http://www.hola.es/"
 
-        val response = restTemplate.postForEntity("http://localhost:$port/api/link",
-            HttpEntity(data, h), ShortUrlDataOut::class.java)
+        val response = restTemplate.postForEntity(
+            "http://localhost:$port/api/link",
+            HttpEntity(data, h), ShortUrlDataOut::class.java
+        )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "shorturl")).isEqualTo(1)

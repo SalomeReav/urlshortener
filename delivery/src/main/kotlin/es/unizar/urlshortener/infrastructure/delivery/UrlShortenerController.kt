@@ -48,9 +48,9 @@ interface UrlShortenerController {
      * Returns the clicks number, clicks number filtered by date and the users count who
      * pressed on a url identified by it [id]
      *
-     * **Note**: Delivery of use cases [GetClicksNumbersUseCase] [GetClicksDayUseCase] [GetUsersCountUseCase].
+     * **Note**: Delivery of use cases [GetClicksNumbersUseCase] [GetClicksDayUseCase] [GetClicksInfoUseCase].
      */
-    fun getClicksInfo(id: String, request: HttpServletRequest): ResponseEntity<ClicksDataOut>
+    fun getClicksInfo(id: String, request: HttpServletRequest): ResponseEntity<ClicksInfo>
 }
 
 /**
@@ -71,11 +71,6 @@ data class ShortUrlDataOut(
     val properties: Map<String, Any> = emptyMap()
 )
 
-data class ClicksDataOut(
-    val clicks: Int = 0,
-    val users: Int = 0,
-    val clicksByDay: Map<String, Any> = emptyMap()
-)
 
 /**
  * The implementation of the controller.
@@ -89,14 +84,11 @@ class UrlShortenerControllerImpl(
     val createShortUrlUseCase: CreateShortUrlUseCase,
     val createQrCodeUseCase: CreateQrCodeUseCase,
     val getQrImageUseCase: GetQrImageUseCase,
-    val getClicksNumberUseCase: GetClicksNumberUseCase,
-    val getClicksDayUseCase: GetClicksDayUseCase,
-    val getUsersCountUseCase: GetUsersCountUseCase,
+    val getClicksInfoUseCase: GetClicksInfoUseCase,
     val limitRedirectUseCase: LimitRedirectUseCase,
-    private val validatorService: ValidatorService,
     val qrQueue: BlockingQueue<String>,
     val limitQueue: BlockingQueue<TimeOfRedirection>,
-    ) : UrlShortenerController {
+) : UrlShortenerController {
 
     @Autowired
     @Async("taskExecutorQrCode")
@@ -123,7 +115,9 @@ class UrlShortenerControllerImpl(
             if (it) {
                 limitQueue.put(TimeOfRedirection(id, OffsetDateTime.now()))
                 redirectUseCase.redirectTo(id).let {
-                    logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
+                    logClickUseCase.logClick(
+                        id, ClickProperties(ip = request.remoteAddr)
+                    )
                     val h = HttpHeaders()
                     h.location = URI.create(it.target)
                     return ResponseEntity<Void>(h, HttpStatus.valueOf(it.mode))
@@ -146,14 +140,10 @@ class UrlShortenerControllerImpl(
         }
 
     @GetMapping("/{id:.*}.json")
-    override fun getClicksInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClicksDataOut> =
+    override fun getClicksInfo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<ClicksInfo> =
         redirectUseCase.redirectTo(id).let {
-            val data = ClicksDataOut(
-                clicks = getClicksNumberUseCase.getClicksNumber(id, request.remoteUser),
-                users = getUsersCountUseCase.getUsersCount(id, request.remoteUser),
-                clicksByDay = getClicksDayUseCase.getClicksDay(id, request.remoteUser)
-            )
-            return ResponseEntity<ClicksDataOut>(data, HttpStatus.OK)
+            val data = getClicksInfoUseCase.getInfo(id)
+            return ResponseEntity<ClicksInfo>(data, HttpStatus.OK)
         }
 
     @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
